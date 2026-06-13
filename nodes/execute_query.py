@@ -1,19 +1,13 @@
 def execute_query(state):
-    print("Excute Query Node")
 
-    sql=state["sql_query"]
+    print("Execute Product Query Node")
 
-    print(sql)
-
-    result = [
-        {
-            "id":1,
-            "sku":"5",
-            "product_name":"QBake Bread",
-            "price":25
-        }
-    ]
+    product_data = {
+        "sku": "SKU123",
+        "name": "Wireless Mouse",
+        "price": 250
+    }
 
     return {
-        "query_result":result
+        "product_data": product_data
     }
