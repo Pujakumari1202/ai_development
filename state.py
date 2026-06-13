@@ -1,8 +1,9 @@
-from typing import TypedDict, List
+from typing import TypedDict
 
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     user_input: str
-    sql_query:str
-    query_result: List
+    intent: str
+    sql_query: str
+    product_data: dict
+    supplier_data: dict
     response: str
-
