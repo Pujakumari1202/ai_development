@@ -1,22 +1,47 @@
 def show_response(state):
 
-    print("Show Reponse Node")
+    print("Show Response Node")
 
-    result =state["query_result"]
+    if state.get("product_data") and state.get("supplier_data"):
 
-    if not result:
-        return {
-            "response":"No Products Found"
-        }
+        response = f"""
+        Product Details
+        ---------------
+        SKU : {state['product_data']['sku']}
+        Name : {state['product_data']['name']}
+        Price : {state['product_data']['price']}
 
-    product = result[0]
+        Supplier Details
+        ----------------
+        Supplier : {state['supplier_data']['supplier']}
+        Contact : {state['supplier_data']['contact']}
+        """
 
-    response = f"""
-    Product:{product['product_name']}
-    SKU:{product['sku']}
-    Price: ${product['price']}
-    """
+    elif state.get("product_data"):
+
+        response = f"""
+        Product Details
+        ---------------
+        SKU : {state['product_data']['sku']}
+        Name : {state['product_data']['name']}
+        Price : {state['product_data']['price']}
+        """
+
+    elif state.get("supplier_data"):
+
+        response = f"""
+        Supplier Details
+        ----------------
+        Supplier : {state['supplier_data']['supplier']}
+        Contact : {state['supplier_data']['contact']}
+        Email : {state['supplier_data']['email']}
+        """
+
+    else:
+        response = state.get("response", "No Data Found")
+
+    print(response)
+
     return {
-        "response":response
+        "response": response
     }
-
