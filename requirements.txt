@@ -1,5 +1,5 @@
-langgraph 
-openai 
+langgraph
+openai
 azure-identity
-dotenv
-
+python-dotenv
+fastmcp
