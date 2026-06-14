@@ -1,4 +1,5 @@
 import os
+import json
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 
@@ -6,7 +7,8 @@ load_dotenv()
 
 client = AzureOpenAI(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION")
 )
 
 deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")
@@ -17,61 +19,58 @@ def generate_query(state):
     print("\nGENERATE QUERY NODE")
 
     user_input = state["user_input"]
+
     prompt = f"""
     You are an Intent Classifier and SQL Generator.
 
-    Database Schema:
+    Database Tables:
 
-    Table: Product
+    Product(
+        id,
+        sku,
+        product_name,
+        description,
+        price
+    )
 
-    Columns:
-    - id
-    - sku
-    - product_name
-    - description
-    - price
+    Supplier(
+        id,
+        sku,
+        supplier_name,
+        contact,
+        email
+    )
 
     Intent Types:
 
-    PRODUCT -> Product details only
-    SUPPLIER -> Supplier details only
-    BOTH -> Product and Supplier details
-    CHAT -> Greetings / casual conversation
+    PRODUCT
+    SUPPLIER
+    BOTH
+    CHAT
 
-    Rules:
-    1. Return JSON only.
-    2. Do not explain anything.
-    3. Generate PostgreSQL SELECT query only.
-    4. For CHAT, sql_query should be empty.
+    Return JSON ONLY.
 
     Examples:
 
-    User: Show product details for SKU123
-
     {{
-        "intent":"PRODUCT",
-        "sql_query":"SELECT * FROM Product WHERE sku='SKU123';"
+    "intent":"PRODUCT",
+    "product_query":"SELECT * FROM Product WHERE sku='SKU123';"
     }}
 
-    User: Show supplier details for SKU123
-
     {{
-        "intent":"SUPPLIER",
-        "sql_query":"SELECT * FROM Product WHERE sku='SKU123';"
+    "intent":"SUPPLIER",
+    "supplier_query":"SELECT * FROM Supplier WHERE sku='SKU123';"
     }}
 
-    User: Show product and supplier details for SKU123
-
     {{
-        "intent":"BOTH",
-        "sql_query":"SELECT * FROM Product WHERE sku='SKU123';"
+    "intent":"BOTH",
+    "product_query":"SELECT * FROM Product WHERE sku='SKU123';",
+    "supplier_query":"SELECT * FROM Supplier WHERE sku='SKU123';"
     }}
 
-    User: Hello
-
     {{
-        "intent":"CHAT",
-        "sql_query":""
+    "intent":"CHAT",
+    "response":"Hello! How can I help you today?"
     }}
 
     User Request:
@@ -88,11 +87,16 @@ def generate_query(state):
         ]
     )
 
-    sql_query = response.choices[0].message.content.strip()
+    result = result.replace("```json", "").replace("```", "").strip()
 
-    print("Generated SQL:")
-    print(sql_query)
+    print("LLM Output:")
+    print(result)
+
+    data = json.loads(result)
 
     return {
-        "sql_query": sql_query
-    }
+    "intent": data.get("intent"),
+    "product_query": data.get("product_query", ""),
+    "supplier_query": data.get("supplier_query", ""),
+    "response": data.get("response", "")
+   } 

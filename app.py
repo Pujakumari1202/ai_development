@@ -4,11 +4,21 @@ while True:
 
     user_input = input("\nUser: ")
 
-    result = app.invoke(
-        {
-            "user_input": user_input
-        }
-    )
+    if user_input.lower() in ["exit", "quit"]:
+        print("Goodbye!")
+        break
 
-    print("\nBot:")
-    print(result["response"])
+    try:
+
+        result = app.invoke(
+            {
+                "user_input": user_input
+            }
+        )
+
+        print("\nBot:")
+        print(result.get("response", "No response generated"))
+
+    except Exception as e:
+
+        print(f"\nError: {e}")

@@ -1,7 +1,5 @@
 def user_input_node(state):
 
-    print("User Input Node")
+    print("USER INPUT NODE")
 
-    return {
-        "user_input": state["user_input"]
-    }
+    return state
