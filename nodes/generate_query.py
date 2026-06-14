@@ -87,7 +87,8 @@ def generate_query(state):
         ]
     )
 
-    result = result.replace("```json", "").replace("```", "").strip()
+    result = response.choices[0].message.content
+    #result = result.replace("```json", "").replace("```", "").strip()
 
     print("LLM Output:")
     print(result)

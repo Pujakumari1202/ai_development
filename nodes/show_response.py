@@ -19,41 +19,48 @@ def show_response(state):
     # BOTH
     if state.get("product_data") and state.get("supplier_data"):
 
-        response = f"""
-    Product Details
-    ---------------
-    SKU : {state['product_data']['sku']}
-    Name : {state['product_data']['product_name']}
-    Price : {state['product_data']['price']}
+        product = state["product_data"][0]
+        supplier = state["supplier_data"][0]
 
-    Supplier Details
-    ----------------
-    Supplier : {state['supplier_data']['supplier_name']}
-    Contact : {state['supplier_data']['contact']}
-    Email : {state['supplier_data']['email']}
-    """
+        response = f"""
+        Product Details
+        ---------------
+        SKU : {product['sku']}
+        Name : {product['product_name']}
+        Price : {product['price']}
+
+        Supplier Details
+        ----------------
+        Supplier : {supplier['supplier_name']}
+        Contact : {supplier['contact']}
+        Email : {supplier['email']}
+        """
 
     # PRODUCT
     elif state.get("product_data"):
 
+        product = state["product_data"][0]
+
         response = f"""
-    Product Details
-    ---------------
-    SKU : {state['product_data']['sku']}
-    Name : {state['product_data']['product_name']}
-    Price : {state['product_data']['price']}
-    """
+        Product Details
+        ---------------
+        SKU : {product['sku']}
+        Name : {product['product_name']}
+        Price : {product['price']}
+        """
 
     # SUPPLIER
     elif state.get("supplier_data"):
 
+        supplier = state["supplier_data"][0]
+
         response = f"""
-    Supplier Details
-    ----------------
-    Supplier : {state['supplier_data']['supplier_name']}
-    Contact : {state['supplier_data']['contact']}
-    Email : {state['supplier_data']['email']}
-    """
+        Supplier Details
+        ----------------
+        Supplier : {supplier['supplier_name']}
+        Contact : {supplier['contact']}
+        Email : {supplier['email']}
+        """
 
     else:
 
