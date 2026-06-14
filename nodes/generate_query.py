@@ -54,18 +54,18 @@ def generate_query(state):
 
     {{
     "intent":"PRODUCT",
-    "product_query":"SELECT * FROM Product WHERE sku='SKU123';"
+    "product_query":"SELECT * FROM Product WHERE sku='QBAKE';"
     }}
 
     {{
     "intent":"SUPPLIER",
-    "supplier_query":"SELECT * FROM Supplier WHERE sku='SKU123';"
+    "supplier_query":"SELECT * FROM Supplier WHERE sku='QBAKE';"
     }}
 
     {{
     "intent":"BOTH",
-    "product_query":"SELECT * FROM Product WHERE sku='SKU123';",
-    "supplier_query":"SELECT * FROM Supplier WHERE sku='SKU123';"
+    "product_query":"SELECT * FROM Product WHERE sku='QBAKE';",
+    "supplier_query":"SELECT * FROM Supplier WHERE sku='QBAKE';"
     }}
 
     {{
