@@ -5,6 +5,6 @@ class AgentState(TypedDict, total=False):
     intent: str
     product_query: str
     supplier_query: str
-    product_data: dict
-    supplier_data: dict
+    product_data: list
+    supplier_data: list
     response: str
