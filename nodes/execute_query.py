@@ -1,3 +1,30 @@
+import os
+import asyncio
+
+from dotenv import load_dotenv
+from fastmcp import Client
+
+load_dotenv()
+
+MCP_SERVER_PATH = os.getenv("MCP_SERVER_PATH")
+
+client = Client(MCP_SERVER_PATH)
+
+
+async def call_mcp(query: str):
+
+    async with client:
+
+        result = await client.call_tool(
+            "run_query",
+            {
+                "query": query
+            }
+        )
+
+        return result
+
+
 def execute_query(state):
 
     print("\nEXECUTE QUERY NODE")
@@ -6,56 +33,37 @@ def execute_query(state):
 
     if intent == "PRODUCT":
 
-        product_data = {
-            "sku": "SKU123",
-            "product_name": "Wireless Mouse",
-            "description": "Bluetooth Wireless Mouse",
-            "price": 250
-        }
+        result = asyncio.run(
+            call_mcp(state["product_query"])
+        )
 
         return {
-            "product_data": product_data
+            "product_data": result
         }
 
     elif intent == "SUPPLIER":
 
-        supplier_data = {
-            "supplier_name": "ABC Pvt Ltd",
-            "contact": "9876543210",
-            "email": "abc@gmail.com"
-        }
+        result = asyncio.run(
+            call_mcp(state["supplier_query"])
+        )
 
         return {
-            "supplier_data": supplier_data
+            "supplier_data": result
         }
 
     elif intent == "BOTH":
 
-        product_data = {
-            "sku": "SKU123",
-            "product_name": "Wireless Mouse",
-            "description": "Bluetooth Wireless Mouse",
-            "price": 250
-        }
+        product_result = asyncio.run(
+            call_mcp(state["product_query"])
+        )
 
-        supplier_data = {
-            "supplier_name": "ABC Pvt Ltd",
-            "contact": "9876543210",
-            "email": "abc@gmail.com"
-        }
+        supplier_result = asyncio.run(
+            call_mcp(state["supplier_query"])
+        )
 
         return {
-            "product_data": product_data,
-            "supplier_data": supplier_data
+            "product_data": product_result,
+            "supplier_data": supplier_result
         }
 
     return {}
-
-
-## replce this with mcp
-# result = client.call_tool(
-#     "execute_product_query",
-#     {
-#         "query": state["product_query"]
-#     }
-# )
