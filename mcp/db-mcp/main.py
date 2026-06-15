@@ -2,4 +2,4 @@ from app.server import mcp
 import app.tools
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="http", host="127.0.0.1", port=9000)
