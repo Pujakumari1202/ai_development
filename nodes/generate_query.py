@@ -1,14 +1,13 @@
 import os
 import json
 from dotenv import load_dotenv
-from openai import AzureOpenAI
+from openai import OpenAI
 
 load_dotenv()
 
-client = AzureOpenAI(
+client = OpenAI(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-    api_version=os.getenv("AZURE_OPENAI_API_VERSION")
+    base_url=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
 deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")
@@ -28,7 +27,7 @@ def generate_query(state):
     Product(
         id,
         sku,
-        product_name,
+        name,
         description,
         price
     )
@@ -42,35 +41,31 @@ def generate_query(state):
     )
 
     Intent Types:
-
-    PRODUCT
-    SUPPLIER
-    BOTH
-    CHAT
+    PRODUCT, SUPPLIER, BOTH, CHAT
 
     Return JSON ONLY.
 
     Examples:
 
     {{
-    "intent":"PRODUCT",
-    "product_query":"SELECT * FROM Product WHERE sku='QBAKE';"
+    "intent": "PRODUCT",
+    "product_query": "SELECT * FROM Product WHERE sku='QB001';"
     }}
 
     {{
-    "intent":"SUPPLIER",
-    "supplier_query":"SELECT * FROM Supplier WHERE sku='QBAKE';"
+    "intent": "SUPPLIER",
+    "supplier_query": "SELECT * FROM Supplier WHERE sku='QB001';"
     }}
 
     {{
-    "intent":"BOTH",
-    "product_query":"SELECT * FROM Product WHERE sku='QBAKE';",
-    "supplier_query":"SELECT * FROM Supplier WHERE sku='QBAKE';"
+    "intent": "BOTH",
+    "product_query": "SELECT * FROM Product WHERE sku='QB001';",
+    "supplier_query": "SELECT * FROM Supplier WHERE sku='QB001';"
     }}
 
     {{
-    "intent":"CHAT",
-    "response":"Hello! How can I help you today?"
+    "intent": "CHAT",
+    "response": "Hello! How can I help you today?"
     }}
 
     User Request:
@@ -80,24 +75,28 @@ def generate_query(state):
     response = client.chat.completions.create(
         model=deployment_name,
         messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "user", "content": prompt}
         ]
     )
 
     result = response.choices[0].message.content
-    #result = result.replace("```json", "").replace("```", "").strip()
+    result = result.replace("```json", "").replace("```", "").strip()
 
     print("LLM Output:")
     print(result)
 
-    data = json.loads(result)
+    try:
+        data = json.loads(result)
+    except Exception as e:
+        print("JSON Parse Error:", e)
+        data = {
+            "intent": "CHAT",
+            "response": "Sorry, I couldn't process your request."
+        }
 
     return {
-    "intent": data.get("intent"),
-    "product_query": data.get("product_query", ""),
-    "supplier_query": data.get("supplier_query", ""),
-    "response": data.get("response", "")
-   } 
+        "intent": data.get("intent"),
+        "product_query": data.get("product_query"),
+        "supplier_query": data.get("supplier_query"),
+        "response": data.get("response")
+    }

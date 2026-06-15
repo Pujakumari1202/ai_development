@@ -1,3 +1,5 @@
 fastmcp
 psycopg[binary]
 python-dotenv
+fastapi
+uvicorn[standard]
