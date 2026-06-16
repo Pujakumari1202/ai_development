@@ -1,5 +1,5 @@
 --
--- PostgreSQL database dump new
+-- PostgreSQL database dump
 --
 
 \restrict siSMZEmTrf4H8ZDunR8ijLpZDNV07PufaXC1o240f8MKKUTCbAYmjkJoLh6Ryvl
