@@ -2,4 +2,10 @@ langgraph
 openai
 azure-identity
 python-dotenv
+<<<<<<< HEAD
 fastmcp
+=======
+fastmcp
+psycopg[binary]
+pyTelegramBotAPI
+>>>>>>> mcp

@@ -1,5 +1,6 @@
 import os
 import asyncio
+<<<<<<< HEAD
 from dotenv import load_dotenv
 from fastmcp import Client
 
@@ -66,6 +67,54 @@ def execute_query(state):
             return {"supplier_data": []}
 
         result = asyncio.run(call_mcp(state["supplier_query"]))
+=======
+
+from dotenv import load_dotenv
+from fastmcp import Client
+
+load_dotenv()
+
+MCP_SERVER_PATH = os.getenv("MCP_SERVER_PATH")
+
+client = Client(MCP_SERVER_PATH)
+
+
+async def call_mcp(query: str):
+
+    async with client:
+
+        result = await client.call_tool(
+            "run_query",
+            {
+                "query": query
+            }
+        )
+
+        return result
+
+
+def execute_query(state):
+
+    print("\nEXECUTE QUERY NODE")
+
+    intent = state.get("intent")
+
+    if intent == "PRODUCT":
+
+        result = asyncio.run(
+            call_mcp(state["product_query"])
+        )
+
+        return {
+            "product_data": result
+        }
+
+    elif intent == "SUPPLIER":
+
+        result = asyncio.run(
+            call_mcp(state["supplier_query"])
+        )
+>>>>>>> mcp
 
         return {
             "supplier_data": result
@@ -73,6 +122,7 @@ def execute_query(state):
 
     elif intent == "BOTH":
 
+<<<<<<< HEAD
         product_result = []
         supplier_result = []
 
@@ -81,12 +131,22 @@ def execute_query(state):
 
         if state.get("supplier_query"):
             supplier_result = asyncio.run(call_mcp(state["supplier_query"]))
+=======
+        product_result = asyncio.run(
+            call_mcp(state["product_query"])
+        )
+
+        supplier_result = asyncio.run(
+            call_mcp(state["supplier_query"])
+        )
+>>>>>>> mcp
 
         return {
             "product_data": product_result,
             "supplier_data": supplier_result
         }
 
+<<<<<<< HEAD
     
     return {
         "response": state.get("response", "Hello! How can I help you?")
@@ -144,3 +204,6 @@ def execute_query(state):
 #     return {}
 
 
+=======
+    return {}
+>>>>>>> mcp
