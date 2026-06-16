@@ -3,3 +3,5 @@ openai
 azure-identity
 python-dotenv
 fastmcp
+psycopg[binary]
+pyTelegramBotAPI
