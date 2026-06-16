@@ -7,11 +7,22 @@ load_dotenv()
 
 MCP_SERVER_PATH = os.getenv("MCP_SERVER_PATH")
 
+# client = Client({
+#     "mcpServers": {
+#         "db": {
+#             "command": "python",
+#             "args": [MCP_SERVER_PATH],
+#             "transport": "stdio"
+#         }
+#     }
+# })
+
+
 client = Client({
     "mcpServers": {
         "db": {
-            "command": "python",
-            "args": [MCP_SERVER_PATH]
+            "url": "http://127.0.0.1:9000/mcp",
+            "transport": "http"
         }
     }
 })
