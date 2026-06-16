@@ -1,5 +1,5 @@
 from fastmcp import FastMCP
 
-mcp = FastMCP("DB Query MCP server")
+mcp = FastMCP("DB MCP server")
 
 import app.tools
