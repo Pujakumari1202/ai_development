@@ -4,9 +4,13 @@
 # if __name__ == "__main__":
 #     mcp.run()
 
-from config import TELEGRAM_TOKEN
+from dotenv import load_dotenv
 import telebot
+import os
 
+load_dotenv()
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 bot = telebot.TeleBot(token=TELEGRAM_TOKEN)
 
