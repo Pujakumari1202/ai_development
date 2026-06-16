@@ -1,6 +1,6 @@
 from app.server import mcp
 from app.db import get_connection
-
+#comment
 
 @mcp.tool()
 def run_query(query: str):

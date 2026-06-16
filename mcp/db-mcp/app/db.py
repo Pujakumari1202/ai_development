@@ -12,8 +12,3 @@ def get_connection():
         password=os.getenv("DB_PASSWORD"),
         port=os.getenv("DB_PORT"),
     )
-# conn = get_connection()
-# cur = conn.cursor()
-# testq="SELECT * FROM product"
-# cur.execute(testq)
-# print(cur.fetchall())
