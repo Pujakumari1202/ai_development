@@ -7,7 +7,7 @@
 from dotenv import load_dotenv
 import telebot
 import os
-
+#data
 load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
