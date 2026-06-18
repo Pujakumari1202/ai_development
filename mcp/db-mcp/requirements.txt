@@ -1,4 +1,0 @@
-fastmcp
-
-psycopg[binary]
-python-dotenv
