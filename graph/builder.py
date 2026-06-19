@@ -4,6 +4,7 @@ from langgraph.graph import END
 from graph.state import AgentState
 
 from nodes.input_node import input_node
+from nodes.intent_extraction import intent_extraction
 from nodes.query_generator import query_generator
 from nodes.clarification import clarification_node
 from nodes.execute_query import execute_query
@@ -25,6 +26,11 @@ def build_graph():
     graph.add_node(
         "input",
         input_node
+    )
+
+    graph.add_node(
+        "intent_extraction",
+        intent_extraction
     )
 
     graph.add_node(
@@ -53,6 +59,11 @@ def build_graph():
 
     graph.add_edge(
         "input",
+        "intent_extraction"
+    )
+
+    graph.add_edge(
+        "intent_extraction",
         "query_generator"
     )
 

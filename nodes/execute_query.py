@@ -8,6 +8,10 @@ def execute_query(state):
         data = run_query(sql_query)
 
         return {
+            "user_input": state.get("user_input", ""),
+            "user_intent": state.get("user_intent", "unknown"),
+            "entities": state.get("entities", {}),
+            "sql_query": sql_query,
             "db_result": data,
             "need_clarification": False,
             "clarification_question": "",

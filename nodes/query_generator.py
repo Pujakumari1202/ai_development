@@ -5,14 +5,19 @@ from prompts.sql_prompt import SQL_PROMPT
 def query_generator(state):
     try:
         user_input = state["user_input"]
+        user_intent = state.get("user_intent", "unknown")
+        entities = state.get("entities", {})
 
         prompt = f"""
     {SQL_PROMPT}
 
+    Intent: {user_intent}
+    Entities: {entities}
+
     User Request:
     {user_input}
     """
-        
+
         response = client.chat.completions.create(
             model=deployment_name,
             messages=[

@@ -2,7 +2,7 @@
 
 This project uses a workflow of:
 - user input
-- intent/entity extraction
+- dynamic intent/entity extraction
 - query generation via Azure OpenAI
 - optional clarification loop
 - SQL execution against PostgreSQL
