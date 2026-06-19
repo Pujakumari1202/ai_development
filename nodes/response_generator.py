@@ -4,11 +4,11 @@ from llm.azure_openai import client, deployment_name
 def response_generator(state):
     try:
         prompt = f"""
-User Question:
-{state['user_input']}
+            User Question:
+            {state['user_input']}
 
-Database Result:
-{state['db_result']}
+            Database Result:
+            {state['db_result']}
 
 Generate a concise natural language response.
 """
@@ -26,6 +26,9 @@ Generate a concise natural language response.
         final_response = response.choices[0].message.content
         
         return {
+            "user_input": state.get("user_input", ""),
+            "user_intent": state.get("user_intent", "unknown"),
+            "entities": state.get("entities", {}),
             "final_response": final_response,
             "need_clarification": False,
             "clarification_question": "",

@@ -10,6 +10,8 @@ def clarification_node(state):
 
         return {
             "user_input": updated_query,
+            "user_intent": state.get("user_intent", "unknown"),
+            "entities": state.get("entities", {}),
             "need_clarification": False,
             "clarification_question": "",
             "sql_query": "",
