@@ -4,6 +4,9 @@ azure-identity
 python-dotenv
 openai
 fastmcp
+fastapi
+uvicorn
 psycopg[binary]
 pyTelegramBotAPI
 python-telegram-bot
+httpx

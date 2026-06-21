@@ -3,14 +3,17 @@ from llm.azure_openai import client, deployment_name
 
 def response_generator(state):
     try:
-        prompt = f"""
-            User Question:
-            {state['user_input']}
+        prompt = f"""You are a helpful assistant. Based on the user's question and database results, provide ONE clear, concise answer.
 
-            Database Result:
-            {state['db_result']}
+User Question: {state['user_input']}
 
-Generate a concise natural language response.
+Database Result: {state['db_result']}
+
+Instructions:
+- Provide only ONE answer
+- Be concise and natural
+- If no results, suggest next steps
+- Do NOT repeat or generate multiple responses
 """
         
         response = client.chat.completions.create(
@@ -23,7 +26,11 @@ Generate a concise natural language response.
             ]
         )
 
-        final_response = response.choices[0].message.content
+        final_response = response.choices[0].message.content.strip()
+        
+        # Remove any "Answer:" prefix if present
+        if final_response.lower().startswith("answer:"):
+            final_response = final_response[7:].strip()
         
         return {
             "user_input": state.get("user_input", ""),

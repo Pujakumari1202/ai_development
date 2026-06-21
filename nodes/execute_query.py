@@ -1,11 +1,11 @@
-from db.postgres import run_query
+from mcp_client import run_query_via_mcp
 
 
 def execute_query(state):
     try:
         sql_query = state["sql_query"]
         
-        data = run_query(sql_query)
+        data = run_query_via_mcp(sql_query)
 
         return {
             "user_input": state.get("user_input", ""),
@@ -18,7 +18,5 @@ def execute_query(state):
             "final_response": ""
         }
     except Exception as e:
-        print(f"[ERROR] In execute_query: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        print(f"[ERROR] Query execution failed: {str(e)}")
         raise
