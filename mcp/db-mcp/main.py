@@ -16,6 +16,15 @@ async def call_tool(request: dict):
             print("MCP Executing query...")
             result = tools.run_query(query=params.get("query"))
             return {"result": result}
+        if tool_name == "find_product_suppliers":
+            result = tools.find_product_suppliers(product_name=params.get("product_name", ""))
+            return {"result": result}
+        if tool_name == "get_supplier_options":
+            result = tools.get_supplier_options(
+                product_name=params.get("product_name", ""),
+                required_by=params.get("required_by", ""),
+            )
+            return {"result": result}
         return {"error": f"Tool '{tool_name}' not found"}
     except Exception as e:
         return {"error": str(e)}

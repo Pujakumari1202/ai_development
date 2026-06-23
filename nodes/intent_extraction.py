@@ -18,9 +18,17 @@ def _fallback_intent(user_input):
 def intent_extraction(state):
     try:
         user_input = state["user_input"]
+        conversation_history = state.get("conversation_history", [])
+        active_order_context = state.get("active_order_context", {})
 
         prompt = f"""
             {INTENT_PROMPT}
+
+            Conversation History:
+            {conversation_history[-6:]}
+
+            Active Order Context:
+            {active_order_context}
 
             User Request:
             {user_input}
@@ -51,22 +59,14 @@ def intent_extraction(state):
             entities = {}
 
         return {
+            **state,
             "user_intent": intent,
             "entities": entities,
-            "sql_query": state.get("sql_query", ""),
-            "need_clarification": state.get("need_clarification", False),
-            "clarification_question": state.get("clarification_question", ""),
-            "db_result": state.get("db_result", []),
-            "final_response": state.get("final_response", "")
         }
     except Exception:
         intent, entities = _fallback_intent(state.get("user_input", ""))
         return {
+            **state,
             "user_intent": intent,
             "entities": entities,
-            "sql_query": state.get("sql_query", ""),
-            "need_clarification": state.get("need_clarification", False),
-            "clarification_question": state.get("clarification_question", ""),
-            "db_result": state.get("db_result", []),
-            "final_response": state.get("final_response", "")
         }
