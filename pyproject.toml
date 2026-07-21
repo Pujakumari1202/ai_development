@@ -1,0 +1,19 @@
+[project]
+name = "ai_development"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "azure-identity>=1.25.3",
+    "fastapi>=0.139.2",
+    "fastmcp>=3.4.4",
+    "httpx>=0.28.1",
+    "langgraph>=1.2.9",
+    "openai>=2.46.0",
+    "psycopg[binary]>=3.3.4",
+    "pytelegrambotapi>=4.36.0",
+    "python-dotenv>=1.2.2",
+    "python-telegram-bot>=22.8",
+    "uvicorn>=0.51.0",
+]

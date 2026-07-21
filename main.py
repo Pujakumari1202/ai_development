@@ -77,10 +77,6 @@ def run_cli():
             print("\nTurnaround:")
             print(result["turnaround_time"])
 
-        if result.get("sql_query"):
-            print("\nGenerated SQL:")
-            print(result["sql_query"])
-
         print("\nAnswer:")
         print(result["final_response"])
 
