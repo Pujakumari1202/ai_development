@@ -1,0 +1,362 @@
+[33mcommit e105e59b5fe9ed2c55e059e246d9749a452d1ac2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32morch[m[33m, [m[1;31morigin/orch[m[33m)[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jul 26 11:51:30 2026 +0530
+
+    database updated
+
+[33mcommit 1b99ed63fc0dd19c4c3496f7479f886f1ab9b7e2[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Thu Jul 23 22:38:19 2026 +0530
+
+    production ready
+
+[33mcommit 80b5020a51deeb532401337eee8de5f18dc15084[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Thu Jul 23 20:09:26 2026 +0530
+
+    commit
+
+[33mcommit 13f154cd05ddcb0058f48a6871d5379f1bf4a6d8[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Tue Jul 21 22:56:00 2026 +0530
+
+    new commit for vitural environment
+
+[33mcommit 8347ed3b4ddd9d126ef9fe4717b9b44ee20ece9e[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Tue Jun 23 23:11:29 2026 +0530
+
+    conersation memory stored
+
+[33mcommit d4ec85e99c072978e8c1e4fbd04b1ce9aada21ef[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 21 20:49:13 2026 +0530
+
+    MCP connect with the Langgraph
+
+[33mcommit fa7964496ad03ccf8f205f0fe638ffc5a003514b[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Fri Jun 19 20:22:08 2026 +0530
+
+    commit of work till user_intent
+
+[33mcommit 1b37696c072896eb6d06a73e42ca906f243d8515[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Thu Jun 18 21:48:49 2026 +0530
+
+    mcp added
+
+[33mcommit 2dab16e2dc83f575d1ccf9717eb286b29e642874[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Thu Jun 18 21:36:00 2026 +0530
+
+    readme.md
+
+[33mcommit a68570975bd4d4bdf7ae883ff1960024e8113bf3[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Thu Jun 18 21:24:29 2026 +0530
+
+    working without mcp till user intent
+
+[33mcommit 65f7d236a085eb5aca119a68af36977d4c6ffb2a[m
+Merge: 38d7bba 8b37055
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 21:25:29 2026 +0530
+
+    Merge branch 'mcp' into orchestration
+
+[33mcommit 8b37055a52190fbaa6b4c5cbaecae587e99846ae[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 21:24:57 2026 +0530
+
+    docker
+
+[33mcommit 79e393c3fd439bb81fc7782ccc97eae55bc5f0d3[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 21:23:15 2026 +0530
+
+    new
+
+[33mcommit 38d7bba7d5eb69e160d215489193af398adee881[m
+Merge: 48bd6e0 541d4ec
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 21:21:14 2026 +0530
+
+    Merge branch 'mcp' into orchestration
+
+[33mcommit 541d4ecd6313590f7a95b1ee0c0ee788b1aef77b[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 21:20:21 2026 +0530
+
+    new changes
+
+[33mcommit 48bd6e05ef3414e6901020924616c180ac6672c0[m
+Merge: 63dce6b 815b80c
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Tue Jun 16 21:20:06 2026 +0530
+
+    Merge branch 'orchestration' of https://github.com/Pujakumari1202/ai_development into orchestration
+
+[33mcommit 63dce6b767949c418a211e40f4df5ba0521a1acf[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Tue Jun 16 21:20:00 2026 +0530
+
+    commit
+
+[33mcommit 58c3ffa9fbedefde42fd7844fca2aefb23c3df38[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 21:02:15 2026 +0530
+
+    new commit
+
+[33mcommit 815b80c86869fe71c63cafc68cc43ecfaa97c5d1[m
+Merge: f1466da 634bdcf
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 11:22:05 2026 +0530
+
+    Merge branch 'mcp' into orchestration
+
+[33mcommit 634bdcf0057961d6da3c87840770ada8cd63383a[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 11:20:56 2026 +0530
+
+    changes
+
+[33mcommit 28ba4b76e45b3e15c51d38a5dd87e114f2e74b6e[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 11:19:56 2026 +0530
+
+    removed cache
+
+[33mcommit f1466da5603c901a3076b66730aa360d13fc5135[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Tue Jun 16 11:11:45 2026 +0530
+
+    Commit
+
+[33mcommit de20debaa7d6c3c326f8a8e78b06dda269fe57b0[m
+Merge: e00095a 775f074
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 10:56:22 2026 +0530
+
+    merge
+
+[33mcommit 775f0747c2319bdb518b422d3897bf3d3cb68f81[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 10:53:51 2026 +0530
+
+    new req
+
+[33mcommit e00095a61dcbf5687239a5941747eb1d73c29743[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Tue Jun 16 10:51:49 2026 +0530
+
+    new commit
+
+[33mcommit 2d21e6ed152b924d74978538be315b45a8d5e24b[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 09:01:43 2026 +0530
+
+    requirements updated
+
+[33mcommit 2dc750d2f6f429d134b9dc10798c1ca4e781a486[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Tue Jun 16 02:48:46 2026 +0530
+
+    changed to http method
+
+[33mcommit f1cf5c17230729fb5fc3d690c38e58bd2f62d26c[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Mon Jun 15 19:57:40 2026 +0530
+
+    new change in execute_query.py
+
+[33mcommit 778d366adecaaeeea94a774b7376ff035ab7d52a[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 21:47:37 2026 +0530
+
+    Updated show response.py
+
+[33mcommit 684e9895bbfe1c8f4ca2c5fa678a3d2c685eb5af[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 21:14:39 2026 +0530
+
+    Commit state.py
+
+[33mcommit 2fa741f9652bc01fcc06a1927465e85dc831ac0a[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 18:58:22 2026 +0530
+
+    Updated execute_query node with mcp server code
+
+[33mcommit 8640a5e810ec5595b23e1f893970f0f67e6a922e[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 13:33:29 2026 +0530
+
+    Updated all code after user intent
+
+[33mcommit d6322dd9d29318fd19ab5c0aa2d5dc1e4f91019b[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:57:34 2026 +0530
+
+    Update app.py file
+
+[33mcommit 185df8dcaa8bc1d14c8be422a62090fd4e15ef86[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:57:14 2026 +0530
+
+    Commit new state
+
+[33mcommit a65eafefe376ce9adc81306dc7dc24a0a0a4bcee[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:56:58 2026 +0530
+
+    Updated show response node
+
+[33mcommit a774630b341eea6d6753f0c887dfe299537992c8[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:56:35 2026 +0530
+
+    Update workflow of the graph
+
+[33mcommit 01c61c10277d73102feecf90222c8c04efe8e941[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:55:58 2026 +0530
+
+    Update route by intent code depends on user query
+
+[33mcommit d78fecf976ddc5183e84c0dcc8ef36284fdc4e89[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:54:10 2026 +0530
+
+    Commit the updated generate query node with user intent
+
+[33mcommit 7b2e1e0c1d88931a7b78a63ad94f13e4ac638b4d[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:52:29 2026 +0530
+
+    removed pycache
+
+[33mcommit 18f5006259215be708eb15a608488d0f3c6b0cc5[m
+Merge: 2a421d0 40d84c8
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:50:06 2026 +0530
+
+    Merge branch 'mcp' into orchestration
+
+[33mcommit 2a421d0f22c3ea223ed01222f1334e677683a68a[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 21:47:37 2026 +0530
+
+    Updated show response.py
+
+[33mcommit 40d84c8264d01460bd67ecbeb1eb333ffafb759c[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:45:36 2026 +0530
+
+    removed non imp folders
+
+[33mcommit 4f26f8fcbea528fef0ee29fb77e5d39ff415ff33[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:44:07 2026 +0530
+
+    new
+
+[33mcommit 5ec317e096414a34639929f3fa21c54e0d663715[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:36:39 2026 +0530
+
+    gitignore updtae
+
+[33mcommit 2d35a0bc82d267968566010e89902dfab856043e[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:28:28 2026 +0530
+
+    new changes
+
+[33mcommit 02636011876000071b50aaee1c16b3b7bcba91ce[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 21:21:55 2026 +0530
+
+    initial setup for telegram
+
+[33mcommit fcd16cc489965fb1415af4d4b9d6e43e94fd3290[m
+Merge: fbb3166 b9997a6
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 21:20:32 2026 +0530
+
+    Merge pull request #1 from Pujakumari1202/langgraph
+    
+    Langgraph
+
+[33mcommit b9997a634ee50fe0f4facfa024276e445cade0d0[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 21:14:39 2026 +0530
+
+    Commit state.py
+
+[33mcommit 3dedddccaa7d99e08e1c1b1ef401caa8d34d201d[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 18:58:22 2026 +0530
+
+    Updated execute_query node with mcp server code
+
+[33mcommit 8999a94d21c21419cd5d1ea997667d54888ec49b[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sun Jun 14 17:01:03 2026 +0530
+
+    docker compose added
+
+[33mcommit 84def256188e22453457f42aaf675916f9ed42cd[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sun Jun 14 13:33:29 2026 +0530
+
+    Updated all code after user intent
+
+[33mcommit bdb462e1702a9e251d38297be58f94fb5b644cd5[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:57:34 2026 +0530
+
+    Update app.py file
+
+[33mcommit d9bdb0e66367ffcc3b2154de592129bcaa8c8895[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:57:14 2026 +0530
+
+    Commit new state
+
+[33mcommit fb8c39c945d66c2393f42efd180d8ebab96c2294[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:56:58 2026 +0530
+
+    Updated show response node
+
+[33mcommit 09728d03607ede4a47bdf44f5808d83ba7f15257[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:56:35 2026 +0530
+
+    Update workflow of the graph
+
+[33mcommit 3546e0dac2c04247aa9ad157c3d2f5a34057143b[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:55:58 2026 +0530
+
+    Update route by intent code depends on user query
+
+[33mcommit e4af6d51e7c0292d75c94ee6e49e1060d86f7e80[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Sat Jun 13 20:54:10 2026 +0530
+
+    Commit the updated generate query node with user intent
+
+[33mcommit b069ffcadbb8d6a17a60ace9ce0ea365909b6a11[m
+Author: Farhan Ali Mirza <farhanalimirza2003@gmail.com>
+Date:   Sat Jun 13 19:45:39 2026 +0530
+
+    db complete
+
+[33mcommit fbb3166c8bd0d5e7317dfba0893a9de3567f32b0[m
+Author: Puja Kumari <149191257+Pujakumari1202@users.noreply.github.com>
+Date:   Thu Jun 11 20:54:45 2026 +0530
+
+    Initial commit

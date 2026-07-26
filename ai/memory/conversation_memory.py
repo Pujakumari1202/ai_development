@@ -148,6 +148,14 @@ def append_message(session_id, role, message):
         with conn.cursor() as cur:
             cur.execute(
                 """
+                INSERT INTO public.conversation_sessions (session_id)
+                VALUES (%s)
+                ON CONFLICT (session_id) DO NOTHING
+                """,
+                (session_id,),
+            )
+            cur.execute(
+                """
                 INSERT INTO public.conversation_messages (session_id, role, message)
                 VALUES (%s, %s, %s)
                 """,

@@ -1,4 +1,5 @@
 from graph.builder import build_graph
+from mcp_client import MCP_SERVER_URL
 from memory.conversation_memory import append_message
 from memory.conversation_memory import ensure_memory_tables
 from memory.conversation_memory import ensure_procurement_tables
@@ -29,6 +30,7 @@ def run_cli():
         return
 
     print(f"Conversation started for {customer_identifier}.")
+    #print(f"Using MCP server: {MCP_SERVER_URL}")
     print("Type 'exit' to close the chat.")
 
     while True:

@@ -1,14 +1,18 @@
-import httpx
-import json
+import os
 
-MCP_SERVER_URL = "http://127.0.0.1:9000"
+import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://127.0.0.1:9000").rstrip("/")
 
 
 def _call_mcp_tool(tool_name: str, params: dict):
-    with httpx.Client() as client:
+    with httpx.Client(timeout=30.0) as client:
         response = client.post(
             f"{MCP_SERVER_URL}/call_tool",
-            json={"tool_name": tool_name, "params": params}
+            json={"tool_name": tool_name, "params": params},
         )
 
         if response.status_code != 200:
