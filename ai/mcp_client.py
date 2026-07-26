@@ -24,6 +24,31 @@ def _call_mcp_tool(tool_name: str, params: dict):
 
         return payload.get("result", [])
 
+
+def ensure_memory_tables_via_mcp():
+    return _call_mcp_tool("ensure_memory_tables", {})
+
+
+def load_session_memory_via_mcp(session_id: str, limit: int = 12):
+    return _call_mcp_tool(
+        "load_session_memory",
+        {"session_id": session_id, "limit": limit},
+    )
+
+
+def append_message_via_mcp(session_id: str, role: str, message: str):
+    return _call_mcp_tool(
+        "append_message",
+        {"session_id": session_id, "role": role, "message": message},
+    )
+
+
+def save_active_order_context_via_mcp(session_id: str, active_order_context: dict):
+    return _call_mcp_tool(
+        "save_active_order_context",
+        {"session_id": session_id, "active_order_context": active_order_context},
+    )
+
 def run_query_via_mcp(query: str):
     """Call run_query tool on MCP server via HTTP"""
     try:

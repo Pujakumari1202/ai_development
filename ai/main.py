@@ -1,10 +1,9 @@
 from graph.builder import build_graph
+from mcp_client import append_message_via_mcp
+from mcp_client import ensure_memory_tables_via_mcp
+from mcp_client import load_session_memory_via_mcp
 from mcp_client import MCP_SERVER_URL
-from memory.conversation_memory import append_message
-from memory.conversation_memory import ensure_memory_tables
-from memory.conversation_memory import ensure_procurement_tables
-from memory.conversation_memory import load_session_memory
-from memory.conversation_memory import save_active_order_context
+from mcp_client import save_active_order_context_via_mcp
 
 
 def build_session_id(customer_identifier):
@@ -19,18 +18,19 @@ def run_cli():
 
     print("\nLoading conversation memory...")
     try:
-        ensure_memory_tables()
-        ensure_procurement_tables()
-        conversation_history, active_order_context = load_session_memory(session_id)
+        ensure_memory_tables_via_mcp()
+        memory_payload = load_session_memory_via_mcp(session_id)
+        conversation_history = memory_payload.get("history", [])
+        active_order_context = memory_payload.get("active_order_context", {})
     except Exception as exc:
         print(f"Unable to load conversation memory: {exc}")
-        print("Check your PostgreSQL connection settings and try again.")
-        print("Expected environment values: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD")
-        print("If you are using docker-compose.yml, start PostgreSQL first and match these values in your .env file.")
+        print("Check that the MCP server is running and can reach the database.")
+        print(f"Expected MCP endpoint: {MCP_SERVER_URL}/call_tool")
         return
 
     print(f"Conversation started for {customer_identifier}.")
-    #print(f"Using MCP server: {MCP_SERVER_URL}")
+    print(f"Using MCP server: {MCP_SERVER_URL}")
+    #print("Conversation memory is persisted through MCP.")
     print("Type 'exit' to close the chat.")
 
     while True:
@@ -53,8 +53,8 @@ def run_cli():
             {"role": "assistant", "message": result.get("final_response", "")},
         ][-12:]
 
-        append_message(session_id, "customer", user_input)
-        append_message(session_id, "assistant", result.get("final_response", ""))
+        append_message_via_mcp(session_id, "customer", user_input)
+        append_message_via_mcp(session_id, "assistant", result.get("final_response", ""))
 
         merged_context = dict(active_order_context)
         merged_context.update(result.get("entities", {}))
@@ -69,7 +69,7 @@ def run_cli():
             merged_context["last_db_result"] = result["db_result"]
 
         active_order_context = merged_context
-        save_active_order_context(session_id, active_order_context)
+        save_active_order_context_via_mcp(session_id, active_order_context)
 
         if result.get("operation_summary"):
             print("\nWorkflow:")

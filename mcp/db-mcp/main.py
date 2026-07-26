@@ -25,6 +25,28 @@ async def call_tool(request: dict):
                 required_by=params.get("required_by", ""),
             )
             return {"result": result}
+        if tool_name == "ensure_memory_tables":
+            result = tools.ensure_memory_tables()
+            return {"result": result}
+        if tool_name == "load_session_memory":
+            result = tools.load_session_memory(
+                session_id=params.get("session_id", ""),
+                limit=params.get("limit", 12),
+            )
+            return {"result": result}
+        if tool_name == "append_message":
+            result = tools.append_message(
+                session_id=params.get("session_id", ""),
+                role=params.get("role", ""),
+                message=params.get("message", ""),
+            )
+            return {"result": result}
+        if tool_name == "save_active_order_context":
+            result = tools.save_active_order_context(
+                session_id=params.get("session_id", ""),
+                active_order_context=params.get("active_order_context", {}),
+            )
+            return {"result": result}
         return {"error": f"Tool '{tool_name}' not found"}
     except Exception as e:
         return {"error": str(e)}
