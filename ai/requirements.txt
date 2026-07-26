@@ -6,7 +6,8 @@ openai
 fastmcp
 fastapi
 uvicorn
-psycopg[binary]
-pyTelegramBotAPI
-python-telegram-bot
 httpx
+psycopg[binary]
+Flask>=3.0.0
+requests>=2.31.0
+gunicorn>=21.2.0
