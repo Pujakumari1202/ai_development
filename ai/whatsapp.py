@@ -3,6 +3,8 @@ import os
 import requests
 from flask import Flask, jsonify, request
 
+from main import process_whatsapp_message
+
 
 app = Flask(__name__)
 
@@ -79,7 +81,15 @@ def receive_webhook():
                 text = message.get("text", {}).get("body", "")
 
                 print(f"Incoming message from {sender}: {text}")
-                #send tect to bot for further processing
+                if not sender or not text:
+                    continue
+
+                try:
+                    result = process_whatsapp_message(sender, text)
+                    send_whatsapp_message(sender, result["final_response"])
+                except Exception:
+                    app.logger.exception("Failed to process WhatsApp message from %s", sender)
+                    return jsonify({"status": "error"}), 500
 
     return jsonify({"status": "received"}), 200
 

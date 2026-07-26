@@ -2,8 +2,10 @@ from graph.builder import build_graph
 from mcp_client import append_message_via_mcp
 from mcp_client import ensure_memory_tables_via_mcp
 from mcp_client import load_session_memory_via_mcp
-from mcp_client import MCP_SERVER_URL
 from mcp_client import save_active_order_context_via_mcp
+
+
+GRAPH = build_graph()
 
 
 def build_session_id(customer_identifier):
@@ -11,77 +13,75 @@ def build_session_id(customer_identifier):
     return f"customer-{normalized}" if normalized else "customer-guest"
 
 
-def run_cli():
-    graph = build_graph()
-    customer_identifier = input("Customer name or phone: ").strip() or "guest"
+def load_session_state(session_id):
+    ensure_memory_tables_via_mcp()
+    memory_payload = load_session_memory_via_mcp(session_id)
+    return {
+        "conversation_history": memory_payload.get("history", []),
+        "active_order_context": memory_payload.get("active_order_context", {}),
+    }
+
+
+def process_message(customer_identifier, user_input):
     session_id = build_session_id(customer_identifier)
+    session_state = load_session_state(session_id)
+    conversation_history = session_state["conversation_history"]
+    active_order_context = session_state["active_order_context"]
 
-    print("\nLoading conversation memory...")
-    try:
-        ensure_memory_tables_via_mcp()
-        memory_payload = load_session_memory_via_mcp(session_id)
-        conversation_history = memory_payload.get("history", [])
-        active_order_context = memory_payload.get("active_order_context", {})
-    except Exception as exc:
-        print(f"Unable to load conversation memory: {exc}")
-        print("Check that the MCP server is running and can reach the database.")
-        print(f"Expected MCP endpoint: {MCP_SERVER_URL}/call_tool")
-        return
+    result = GRAPH.invoke(
+        {
+            "user_input": user_input,
+            "conversation_history": conversation_history,
+            "active_order_context": active_order_context,
+        }
+    )
 
-    print(f"Conversation started for {customer_identifier}.")
-    print(f"Using MCP server: {MCP_SERVER_URL}")
-    #print("Conversation memory is persisted through MCP.")
-    print("Type 'exit' to close the chat.")
+    final_response = result.get("final_response", "")
 
-    while True:
-        user_input = input("\nAsk Question: ")
-
-        if user_input.lower() == "exit":
-            break
-
-        result = graph.invoke(
-            {
-                "user_input": user_input,
-                "conversation_history": conversation_history,
-                "active_order_context": active_order_context,
-            }
+    if result.get("need_clarification"):
+        final_response = result.get(
+            "clarification_question",
+            "Please share a few more details so I can help.",
+        )
+    elif result.get("need_human"):
+        final_response = result.get(
+            "pending_human_message",
+            "Your request needs manual review. Our team will get back to you shortly.",
         )
 
-        conversation_history = [
-            *conversation_history,
-            {"role": "customer", "message": user_input},
-            {"role": "assistant", "message": result.get("final_response", "")},
-        ][-12:]
+    conversation_history = [
+        *conversation_history,
+        {"role": "customer", "message": user_input},
+        {"role": "assistant", "message": final_response},
+    ][-12:]
 
-        append_message_via_mcp(session_id, "customer", user_input)
-        append_message_via_mcp(session_id, "assistant", result.get("final_response", ""))
+    append_message_via_mcp(session_id, "customer", user_input)
+    append_message_via_mcp(session_id, "assistant", final_response)
 
-        merged_context = dict(active_order_context)
-        merged_context.update(result.get("entities", {}))
+    merged_context = dict(active_order_context)
+    merged_context.update(result.get("entities", {}))
 
-        if result.get("turnaround_time"):
-            merged_context["turnaround_time"] = result["turnaround_time"]
+    if result.get("turnaround_time"):
+        merged_context["turnaround_time"] = result["turnaround_time"]
 
-        if result.get("operation_summary"):
-            merged_context["last_operation_summary"] = result["operation_summary"]
+    if result.get("operation_summary"):
+        merged_context["last_operation_summary"] = result["operation_summary"]
 
-        if result.get("db_result"):
-            merged_context["last_db_result"] = result["db_result"]
+    if result.get("db_result"):
+        merged_context["last_db_result"] = result["db_result"]
 
-        active_order_context = merged_context
-        save_active_order_context_via_mcp(session_id, active_order_context)
+    save_active_order_context_via_mcp(session_id, merged_context)
 
-        if result.get("operation_summary"):
-            print("\nWorkflow:")
-            print(result["operation_summary"])
-
-        if result.get("turnaround_time"):
-            print("\nTurnaround:")
-            print(result["turnaround_time"])
-
-        print("\nAnswer:")
-        print(result["final_response"])
+    return {
+        "session_id": session_id,
+        "final_response": final_response,
+        "operation_summary": result.get("operation_summary"),
+        "turnaround_time": result.get("turnaround_time"),
+        "raw_result": result,
+    }
 
 
-if __name__ == "__main__":
-    run_cli()
+
+
+def process_whatsapp_message(sender, text):
+    return process_message(sender, text)

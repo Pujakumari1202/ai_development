@@ -8,6 +8,8 @@ dependencies = [
     "azure-identity>=1.25.3",
     "fastapi>=0.139.2",
     "fastmcp>=3.4.4",
+    "flask>=3.0.0",
+    "gunicorn>=21.2.0",
     "httpx>=0.28.1",
     "langgraph>=1.2.9",
     "openai>=2.46.0",
@@ -15,5 +17,6 @@ dependencies = [
     "pytelegrambotapi>=4.36.0",
     "python-dotenv>=1.2.2",
     "python-telegram-bot>=22.8",
+    "requests>=2.31.0",
     "uvicorn>=0.51.0",
 ]
