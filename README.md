@@ -32,11 +32,11 @@ Create a `.env` file in the project root and set:
 AZURE_OPENAI_API_KEY=
 AZURE_OPENAI_ENDPOINT=
 AZURE_OPENAI_DEPLOYMENT=
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=demo_db
-DB_USER=postgres
-DB_PASSWORD=password12
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
 ```
 
 If you are using [docker-compose.yml](<ai_development/docker-compose.yml>), start PostgreSQL with:
