@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict FglwTRaja3gcE01CuSSTk60Q2AfCRgZsIJtynXQaWjOZ3hYLcOuSVnoieyyud94
+\restrict igVS6XC5fRWp2WQ6olmYH0RGNoTpC0FbyyPBznMA7sAwR09a5Pr17ZfAIQyawWF
 
 -- Dumped from database version 17.10 (Debian 17.10-1.pgdg13+1)
 -- Dumped by pg_dump version 17.10 (Debian 17.10-1.pgdg13+1)
@@ -22,6 +22,56 @@ SET row_security = off;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: conversation_messages; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.conversation_messages (
+    message_id bigint NOT NULL,
+    session_id character varying(100) NOT NULL,
+    role character varying(20) NOT NULL,
+    message text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.conversation_messages OWNER TO postgres;
+
+--
+-- Name: conversation_messages_message_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.conversation_messages_message_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.conversation_messages_message_id_seq OWNER TO postgres;
+
+--
+-- Name: conversation_messages_message_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.conversation_messages_message_id_seq OWNED BY public.conversation_messages.message_id;
+
+
+--
+-- Name: conversation_sessions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.conversation_sessions (
+    session_id character varying(100) NOT NULL,
+    active_order_context jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.conversation_sessions OWNER TO postgres;
 
 --
 -- Name: customers; Type: TABLE; Schema: public; Owner: postgres
@@ -204,6 +254,13 @@ ALTER SEQUENCE public.suppliers_supplier_id_seq OWNED BY public.suppliers.suppli
 
 
 --
+-- Name: conversation_messages message_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.conversation_messages ALTER COLUMN message_id SET DEFAULT nextval('public.conversation_messages_message_id_seq'::regclass);
+
+
+--
 -- Name: customers customer_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -236,6 +293,22 @@ ALTER TABLE ONLY public.products ALTER COLUMN product_id SET DEFAULT nextval('pu
 --
 
 ALTER TABLE ONLY public.suppliers ALTER COLUMN supplier_id SET DEFAULT nextval('public.suppliers_supplier_id_seq'::regclass);
+
+
+--
+-- Name: conversation_messages conversation_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.conversation_messages
+    ADD CONSTRAINT conversation_messages_pkey PRIMARY KEY (message_id);
+
+
+--
+-- Name: conversation_sessions conversation_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.conversation_sessions
+    ADD CONSTRAINT conversation_sessions_pkey PRIMARY KEY (session_id);
 
 
 --
@@ -295,6 +368,14 @@ ALTER TABLE ONLY public.suppliers
 
 
 --
+-- Name: conversation_messages fk_conversation_session; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.conversation_messages
+    ADD CONSTRAINT fk_conversation_session FOREIGN KEY (session_id) REFERENCES public.conversation_sessions(session_id) ON DELETE CASCADE;
+
+
+--
 -- Name: order_lines order_lines_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -338,5 +419,5 @@ ALTER TABLE ONLY public.products
 -- PostgreSQL database dump complete
 --
 
-\unrestrict FglwTRaja3gcE01CuSSTk60Q2AfCRgZsIJtynXQaWjOZ3hYLcOuSVnoieyyud94
+\unrestrict igVS6XC5fRWp2WQ6olmYH0RGNoTpC0FbyyPBznMA7sAwR09a5Pr17ZfAIQyawWF
 

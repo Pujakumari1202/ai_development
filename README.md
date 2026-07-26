@@ -23,7 +23,7 @@ Conversation history can be stored in PostgreSQL using:
 - `public.conversation_sessions`
 - `public.conversation_messages`
 
-Create those tables by running [conversation_memory.sql](c:/Users/PUJA%20KUMARI/Desktop/ai_development/conversation_memory.sql) once in your database.
+Create those tables by running [conversation_memory.sql](<ai_development/conversation_memory.sql>) once in your database.
 
 ## Local setup
 Create a `.env` file in the project root and set:
@@ -39,7 +39,7 @@ DB_USER=postgres
 DB_PASSWORD=password12
 ```
 
-If you are using [docker-compose.yml](c:/Users/PUJA%20KUMARI/Desktop/ai_development/docker-compose.yml), start PostgreSQL with:
+If you are using [docker-compose.yml](<ai_development/docker-compose.yml>), start PostgreSQL with:
 
 ```bash
 docker compose up -d postgres
