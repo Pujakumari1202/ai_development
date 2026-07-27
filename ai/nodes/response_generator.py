@@ -2,6 +2,14 @@ from llm.azure_openai import client, deployment_name
 
 
 def _build_supplier_followup_response(state):
+    supplier_contact_result = state.get("supplier_contact_result") or {}
+    if supplier_contact_result:
+        supplier_name = supplier_contact_result.get("supplier_name") or "the supplier"
+        return (
+            f"I found {supplier_name} in the supplier table and I will handle the supplier follow-up for you. "
+            "If the supplier replies, I will send the reply back to you directly."
+        )
+
     if state.get("operation_mode") != "operations":
         return ""
 
@@ -19,7 +27,6 @@ def _build_supplier_followup_response(state):
 
     supplier = db_result[0]
     supplier_name = supplier.get("supplier_name") or "the supplier"
-    phone_number = supplier.get("phone_number") or "not available"
     product_name = supplier.get("product_name") or state.get("entities", {}).get("product_name") or "the requested product"
     price = supplier.get("price")
     turnaround_time = supplier.get("turnaround_time") or state.get("turnaround_time") or "not confirmed"
@@ -30,9 +37,9 @@ def _build_supplier_followup_response(state):
 
     return (
         f"I found {supplier_name} in the supplier table for {product_name}{quantity_text}. "
-        f"Use supplier contact {phone_number} for the follow-up.{price_text} "
+        f"I will handle the supplier follow-up for you.{price_text} "
         f"Listed turnaround is {turnaround_time}. "
-        "I will treat this as a supplier-contact action and report back with the supplier confirmation format rather than asking you to contact them yourself."
+        "If the supplier replies, I will send the reply back to you directly."
     )
 
 

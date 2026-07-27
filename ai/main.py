@@ -8,8 +8,10 @@ from mcp_client import append_message_via_mcp
 from mcp_client import complete_pending_supplier_outreach_via_mcp
 from mcp_client import create_pending_supplier_outreach_via_mcp
 from mcp_client import ensure_memory_tables_via_mcp
+from mcp_client import find_expired_pending_supplier_outreach_via_mcp
 from mcp_client import find_pending_supplier_outreach_by_supplier_phone_via_mcp
 from mcp_client import load_session_memory_via_mcp
+from mcp_client import mark_pending_supplier_outreach_timed_out_via_mcp
 from mcp_client import save_active_order_context_via_mcp
 
 
@@ -168,6 +170,34 @@ def handle_supplier_reply(sender: str, text: str) -> bool:
     return True
 
 
+def process_supplier_timeouts(limit: int = 50) -> dict:
+    expired_outreach = find_expired_pending_supplier_outreach_via_mcp(limit)
+    processed = 0
+
+    for pending in expired_outreach:
+        completion = mark_pending_supplier_outreach_timed_out_via_mcp(pending.get("outreach_id"))
+        if not completion:
+            continue
+
+        customer_phone_number = completion.get("customer_phone_number")
+        customer_session_id = completion.get("customer_session_id")
+        supplier_name = completion.get("supplier_name") or pending.get("supplier_name") or "the supplier"
+        product_name = completion.get("product_name") or pending.get("product_name") or "the product"
+
+        if customer_phone_number:
+            customer_message = (
+                f"I did not receive a reply from {supplier_name} within 30 minutes for {product_name}. "
+                "If you want, I can try another supplier or you can send a new follow-up request."
+            )
+            send_whatsapp_message(customer_phone_number, customer_message)
+            if customer_session_id:
+                append_message_via_mcp(customer_session_id, "assistant", customer_message)
+
+        processed += 1
+
+    return {"processed": processed}
+
+
 def process_message(customer_identifier, user_input):
     session_id = build_session_id(customer_identifier)
     session_state = load_session_state(session_id)
@@ -288,6 +318,12 @@ def health_check():
 @app.get("/healthz")
 def healthz():
     return jsonify({"status": "ok"}), 200
+
+
+@app.post("/supplier-timeouts")
+def supplier_timeouts():
+    result = process_supplier_timeouts()
+    return jsonify(result), 200
 
 
 @app.get("/webhook")

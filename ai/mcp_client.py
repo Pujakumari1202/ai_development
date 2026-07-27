@@ -88,6 +88,20 @@ def complete_pending_supplier_outreach_via_mcp(outreach_id: int, supplier_reply:
         {"outreach_id": outreach_id, "supplier_reply": supplier_reply},
     )
 
+
+def find_expired_pending_supplier_outreach_via_mcp(limit: int = 50):
+    return _call_mcp_tool(
+        "find_expired_pending_supplier_outreach",
+        {"limit": limit},
+    )
+
+
+def mark_pending_supplier_outreach_timed_out_via_mcp(outreach_id: int):
+    return _call_mcp_tool(
+        "mark_pending_supplier_outreach_timed_out",
+        {"outreach_id": outreach_id},
+    )
+
 def run_query_via_mcp(query: str):
     """Call run_query tool on MCP server via HTTP"""
     try:

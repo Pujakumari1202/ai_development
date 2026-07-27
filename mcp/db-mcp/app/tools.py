@@ -268,6 +268,83 @@ def complete_pending_supplier_outreach(outreach_id: int, supplier_reply: str):
 
 
 @mcp.tool()
+def find_expired_pending_supplier_outreach(limit: int = 50):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    outreach_id,
+                    customer_session_id,
+                    customer_phone_number,
+                    supplier_phone_number,
+                    supplier_name,
+                    product_name,
+                    quantity,
+                    request_message,
+                    status,
+                    created_at,
+                    expires_at
+                FROM public.pending_supplier_outreach
+                WHERE status = 'pending'
+                  AND expires_at < CURRENT_TIMESTAMP
+                ORDER BY expires_at ASC
+                LIMIT %s
+                """,
+                (limit,),
+            )
+            rows = cur.fetchall()
+        conn.commit()
+
+    results = []
+    for row in rows:
+        results.append(
+            {
+                "outreach_id": row[0],
+                "customer_session_id": row[1],
+                "customer_phone_number": row[2],
+                "supplier_phone_number": row[3],
+                "supplier_name": row[4],
+                "product_name": row[5],
+                "quantity": row[6],
+                "request_message": row[7],
+                "status": row[8],
+                "created_at": row[9].isoformat() if row[9] else None,
+                "expires_at": row[10].isoformat() if row[10] else None,
+            }
+        )
+    return results
+
+
+@mcp.tool()
+def mark_pending_supplier_outreach_timed_out(outreach_id: int):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE public.pending_supplier_outreach
+                SET status = 'timed_out'
+                WHERE outreach_id = %s
+                  AND status = 'pending'
+                RETURNING customer_session_id, customer_phone_number, supplier_name, product_name
+                """,
+                (outreach_id,),
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    if not row:
+        return {}
+
+    return {
+        "customer_session_id": row[0],
+        "customer_phone_number": row[1],
+        "supplier_name": row[2],
+        "product_name": row[3],
+    }
+
+
+@mcp.tool()
 def run_query(query: str):
 
     with get_connection() as conn:
