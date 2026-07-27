@@ -13,13 +13,7 @@ def execute_query(state):
         product_name = entities.get("product_name") or active_order_context.get("product_name")
         required_by = entities.get("required_by") or active_order_context.get("required_by") or active_order_context.get("turnaround_time", "")
 
-        if (
-            user_intent in {"find_products", "compare_suppliers", "check_turnaround"}
-            or (
-                state.get("operation_mode") == "operations"
-                and product_name
-            )
-        ) and product_name:
+        if user_intent in {"find_products", "compare_suppliers", "check_turnaround"} and product_name:
             if required_by:
                 data = get_supplier_options_via_mcp(product_name, required_by)
             else:

@@ -9,12 +9,7 @@ def _build_supplier_contact_result(state):
     supplier = db_result[0]
     quantity = entities.get("quantity") or active_order_context.get("quantity") or 0
     listed_price = supplier.get("price")
-    negotiated_price = listed_price
-
-    if quantity and listed_price is not None and quantity >= 100:
-        negotiated_price = round(float(listed_price) - 0.15, 2)
-
-    total_price = round(negotiated_price * quantity, 2) if quantity and negotiated_price is not None else None
+    total_price = round(float(listed_price) * quantity, 2) if quantity and listed_price is not None else None
 
     return {
         "supplier_name": supplier.get("supplier_name"),
@@ -22,15 +17,12 @@ def _build_supplier_contact_result(state):
         "product_name": supplier.get("product_name"),
         "quantity": quantity,
         "listed_price": listed_price,
-        "confirmed_price": negotiated_price,
-        "confirmed_total": total_price,
+        "confirmed_price": None,
+        "confirmed_total": None,
+        "listed_total": total_price,
         "delivery_eta": supplier.get("turnaround_time") or state.get("turnaround_time") or "not confirmed",
-        "status": "confirmed",
-        "supplier_reply": (
-            f"Yes, we can supply {quantity} of {supplier.get('product_name')} at QAR {negotiated_price} each"
-            if quantity and negotiated_price is not None
-            else f"Yes, we can supply {supplier.get('product_name')} at QAR {negotiated_price} each"
-        ),
+        "status": "pending_supplier_reply",
+        "supplier_reply": "",
     }
 
 

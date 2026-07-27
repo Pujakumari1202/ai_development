@@ -40,7 +40,7 @@ def response_generator(state):
     try:
 
         supplier_contact_result = state.get("supplier_contact_result") or {}
-        if supplier_contact_result:
+        if supplier_contact_result and supplier_contact_result.get("status") == "confirmed":
             supplier_name = supplier_contact_result.get("supplier_name") or "Supplier"
             supplier_reply = supplier_contact_result.get("supplier_reply") or "Supplier confirmed availability."
             confirmed_price = supplier_contact_result.get("confirmed_price")
