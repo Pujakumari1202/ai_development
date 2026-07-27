@@ -49,6 +49,45 @@ def save_active_order_context_via_mcp(session_id: str, active_order_context: dic
         {"session_id": session_id, "active_order_context": active_order_context},
     )
 
+
+def create_pending_supplier_outreach_via_mcp(
+    customer_session_id: str,
+    customer_phone_number: str,
+    supplier_phone_number: str,
+    supplier_name: str,
+    product_name: str,
+    quantity,
+    request_message: str,
+    expires_in_minutes: int = 30,
+):
+    return _call_mcp_tool(
+        "create_pending_supplier_outreach",
+        {
+            "customer_session_id": customer_session_id,
+            "customer_phone_number": customer_phone_number,
+            "supplier_phone_number": supplier_phone_number,
+            "supplier_name": supplier_name,
+            "product_name": product_name,
+            "quantity": quantity,
+            "request_message": request_message,
+            "expires_in_minutes": expires_in_minutes,
+        },
+    )
+
+
+def find_pending_supplier_outreach_by_supplier_phone_via_mcp(supplier_phone_number: str):
+    return _call_mcp_tool(
+        "find_pending_supplier_outreach_by_supplier_phone",
+        {"supplier_phone_number": supplier_phone_number},
+    )
+
+
+def complete_pending_supplier_outreach_via_mcp(outreach_id: int, supplier_reply: str):
+    return _call_mcp_tool(
+        "complete_pending_supplier_outreach",
+        {"outreach_id": outreach_id, "supplier_reply": supplier_reply},
+    )
+
 def run_query_via_mcp(query: str):
     """Call run_query tool on MCP server via HTTP"""
     try:

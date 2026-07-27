@@ -5,7 +5,10 @@ from flask import Flask, jsonify, request
 
 from graph.builder import build_graph
 from mcp_client import append_message_via_mcp
+from mcp_client import complete_pending_supplier_outreach_via_mcp
+from mcp_client import create_pending_supplier_outreach_via_mcp
 from mcp_client import ensure_memory_tables_via_mcp
+from mcp_client import find_pending_supplier_outreach_by_supplier_phone_via_mcp
 from mcp_client import load_session_memory_via_mcp
 from mcp_client import save_active_order_context_via_mcp
 
@@ -33,6 +36,138 @@ def load_session_state(session_id):
     }
 
 
+def normalize_whatsapp_recipient(phone_number: str) -> str:
+    digits = "".join(character for character in str(phone_number or "") if character.isdigit())
+    if not digits:
+        return ""
+    if digits.startswith("0"):
+        digits = digits.lstrip("0")
+    if not digits.startswith("91") and len(digits) == 10:
+        digits = f"91{digits}"
+    return digits
+
+
+def build_supplier_outreach_message(result: dict) -> str:
+    supplier_contact_result = result.get("supplier_contact_result") or {}
+    entities = result.get("entities") or {}
+
+    supplier_name = supplier_contact_result.get("supplier_name") or "Supplier"
+    product_name = supplier_contact_result.get("product_name") or entities.get("product_name") or "the requested product"
+    quantity = supplier_contact_result.get("quantity") or entities.get("quantity") or "the requested quantity"
+    target_price = entities.get("target_price")
+    required_by = entities.get("required_by") or result.get("turnaround_time") or "the requested date"
+
+    target_price_text = f" Target price is QAR {target_price}." if target_price else ""
+
+    return (
+        f"Hello {supplier_name}, please confirm if you can supply {quantity} of {product_name} by {required_by}.{target_price_text} "
+        "Please reply with your best price, total amount, delivery ETA, and stock confirmation."
+    )
+
+
+def should_contact_supplier(result: dict) -> bool:
+    user_input = (result.get("user_input") or "").lower()
+    operation_mode = result.get("operation_mode")
+    operation_action = result.get("operation_action")
+    supplier_contact_result = result.get("supplier_contact_result") or {}
+
+    if not supplier_contact_result:
+        return False
+
+    if operation_mode != "operations":
+        return False
+
+    if operation_action != "human_handoff":
+        return False
+
+    return any(
+        phrase in user_input
+        for phrase in [
+            "check with supplier",
+            "contact supplier",
+            "connect with supplier",
+            "ask supplier",
+            "lower price",
+            "cheap price",
+            "best price",
+            "negotiate",
+            "confirm availability",
+            "can he give",
+            "can he send",
+        ]
+    )
+
+
+def contact_supplier_via_whatsapp(result: dict) -> dict:
+    supplier_contact_result = result.get("supplier_contact_result") or {}
+    phone_number = normalize_whatsapp_recipient(supplier_contact_result.get("phone_number"))
+    if not phone_number:
+        return {"status": "skipped", "reason": "missing_supplier_phone"}
+
+    message = build_supplier_outreach_message(result)
+
+    try:
+        send_whatsapp_message(phone_number, message)
+        return {
+            "status": "sent",
+            "recipient": phone_number,
+            "message": message,
+        }
+    except Exception as exc:
+        app.logger.exception("Failed to send supplier WhatsApp message to %s", phone_number)
+        return {
+            "status": "failed",
+            "recipient": phone_number,
+            "message": message,
+            "reason": str(exc),
+        }
+
+
+def register_pending_supplier_outreach(customer_identifier: str, session_id: str, result: dict, supplier_message_status: dict) -> dict:
+    if supplier_message_status.get("status") != "sent":
+        return {}
+
+    supplier_contact_result = result.get("supplier_contact_result") or {}
+    supplier_phone_number = supplier_message_status.get("recipient") or normalize_whatsapp_recipient(
+        supplier_contact_result.get("phone_number")
+    )
+
+    if not supplier_phone_number:
+        return {}
+
+    return create_pending_supplier_outreach_via_mcp(
+        customer_session_id=session_id,
+        customer_phone_number=normalize_whatsapp_recipient(customer_identifier),
+        supplier_phone_number=supplier_phone_number,
+        supplier_name=supplier_contact_result.get("supplier_name") or "Supplier",
+        product_name=supplier_contact_result.get("product_name") or (result.get("entities") or {}).get("product_name") or "product",
+        quantity=supplier_contact_result.get("quantity") or (result.get("entities") or {}).get("quantity"),
+        request_message=supplier_message_status.get("message") or build_supplier_outreach_message(result),
+        expires_in_minutes=30,
+    )
+
+
+def handle_supplier_reply(sender: str, text: str) -> bool:
+    pending = find_pending_supplier_outreach_by_supplier_phone_via_mcp(normalize_whatsapp_recipient(sender))
+    if not pending:
+        return False
+
+    completion = complete_pending_supplier_outreach_via_mcp(
+        outreach_id=pending.get("outreach_id"),
+        supplier_reply=text,
+    )
+    customer_phone_number = completion.get("customer_phone_number")
+    supplier_name = completion.get("supplier_name") or pending.get("supplier_name") or "Supplier"
+    product_name = completion.get("product_name") or pending.get("product_name") or "the product"
+
+    if customer_phone_number:
+        customer_message = f"{supplier_name} replied for {product_name}: {text}"
+        send_whatsapp_message(customer_phone_number, customer_message)
+        append_message_via_mcp(pending.get("customer_session_id"), "assistant", customer_message)
+
+    return True
+
+
 def process_message(customer_identifier, user_input):
     session_id = build_session_id(customer_identifier)
     session_state = load_session_state(session_id)
@@ -47,7 +182,27 @@ def process_message(customer_identifier, user_input):
         }
     )
 
+    supplier_message_status = {}
+    if should_contact_supplier(result):
+        supplier_message_status = contact_supplier_via_whatsapp(result)
+        result["supplier_message_status"] = supplier_message_status
+        pending_outreach = register_pending_supplier_outreach(customer_identifier, session_id, result, supplier_message_status)
+        if pending_outreach:
+            result["pending_supplier_outreach"] = pending_outreach
+
     final_response = result.get("final_response", "")
+
+    if supplier_message_status.get("status") == "sent":
+        supplier_name = (result.get("supplier_contact_result") or {}).get("supplier_name") or "the supplier"
+        final_response = (
+            f"I have sent a WhatsApp message to {supplier_name}. If the supplier replies immediately, I will forward the reply to you right away. "
+            "If there is no reply yet, I will keep this pending for up to 30 minutes."
+        )
+    elif supplier_message_status.get("status") == "failed":
+        final_response = (
+            "I found the supplier and tried to send the WhatsApp message, but the send failed. "
+            f"Reason: {supplier_message_status.get('reason', 'unknown error')}."
+        )
 
     if result.get("need_clarification"):
         final_response = result.get(
@@ -168,6 +323,8 @@ def receive_webhook():
                     continue
 
                 try:
+                    if handle_supplier_reply(sender, text):
+                        continue
                     result = process_whatsapp_message(sender, text)
                     send_whatsapp_message(sender, result["final_response"])
                 except Exception:

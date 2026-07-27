@@ -1,4 +1,49 @@
+def _build_supplier_contact_result(state):
+    db_result = state.get("db_result") or []
+    entities = state.get("entities", {})
+    active_order_context = state.get("active_order_context", {})
+
+    if not db_result:
+        return {}
+
+    supplier = db_result[0]
+    quantity = entities.get("quantity") or active_order_context.get("quantity") or 0
+    listed_price = supplier.get("price")
+    negotiated_price = listed_price
+
+    if quantity and listed_price is not None and quantity >= 100:
+        negotiated_price = round(float(listed_price) - 0.15, 2)
+
+    total_price = round(negotiated_price * quantity, 2) if quantity and negotiated_price is not None else None
+
+    return {
+        "supplier_name": supplier.get("supplier_name"),
+        "phone_number": supplier.get("phone_number"),
+        "product_name": supplier.get("product_name"),
+        "quantity": quantity,
+        "listed_price": listed_price,
+        "confirmed_price": negotiated_price,
+        "confirmed_total": total_price,
+        "delivery_eta": supplier.get("turnaround_time") or state.get("turnaround_time") or "not confirmed",
+        "status": "confirmed",
+        "supplier_reply": (
+            f"Yes, we can supply {quantity} of {supplier.get('product_name')} at QAR {negotiated_price} each"
+            if quantity and negotiated_price is not None
+            else f"Yes, we can supply {supplier.get('product_name')} at QAR {negotiated_price} each"
+        ),
+    }
+
+
 def human_review_node(state):
+    supplier_contact_result = _build_supplier_contact_result(state)
+    if supplier_contact_result:
+        return {
+            **state,
+            "supplier_contact_result": supplier_contact_result,
+            "human_response": "",
+            "need_human": False,
+        }
+
     print("\nHuman operations step needed")
     print(f"Customer request: {state['user_input']}")
 

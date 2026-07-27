@@ -16,3 +16,19 @@ CREATE TABLE IF NOT EXISTS public.conversation_messages (
         REFERENCES public.conversation_sessions(session_id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS public.pending_supplier_outreach (
+    outreach_id BIGSERIAL PRIMARY KEY,
+    customer_session_id VARCHAR(100) NOT NULL,
+    customer_phone_number VARCHAR(30) NOT NULL,
+    supplier_phone_number VARCHAR(30) NOT NULL,
+    supplier_name VARCHAR(100) NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    quantity INTEGER,
+    request_message TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    supplier_reply TEXT,
+    replied_at TIMESTAMP
+);

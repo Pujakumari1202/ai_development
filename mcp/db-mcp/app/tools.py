@@ -39,6 +39,25 @@ def ensure_memory_tables():
                 )
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS public.pending_supplier_outreach (
+                    outreach_id BIGSERIAL PRIMARY KEY,
+                    customer_session_id VARCHAR(100) NOT NULL,
+                    customer_phone_number VARCHAR(30) NOT NULL,
+                    supplier_phone_number VARCHAR(30) NOT NULL,
+                    supplier_name VARCHAR(100) NOT NULL,
+                    product_name VARCHAR(100) NOT NULL,
+                    quantity INTEGER,
+                    request_message TEXT NOT NULL,
+                    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    expires_at TIMESTAMP NOT NULL,
+                    supplier_reply TEXT,
+                    replied_at TIMESTAMP
+                )
+                """
+            )
         conn.commit()
     return {"status": "ok"}
 
@@ -122,6 +141,130 @@ def save_active_order_context(session_id: str, active_order_context: dict):
             )
         conn.commit()
     return {"status": "ok"}
+
+
+@mcp.tool()
+def create_pending_supplier_outreach(
+    customer_session_id: str,
+    customer_phone_number: str,
+    supplier_phone_number: str,
+    supplier_name: str,
+    product_name: str,
+    quantity: int | None,
+    request_message: str,
+    expires_in_minutes: int = 30,
+):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO public.pending_supplier_outreach (
+                    customer_session_id,
+                    customer_phone_number,
+                    supplier_phone_number,
+                    supplier_name,
+                    product_name,
+                    quantity,
+                    request_message,
+                    expires_at
+                )
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s,
+                    CURRENT_TIMESTAMP + (%s || ' minutes')::interval
+                )
+                RETURNING outreach_id, expires_at
+                """,
+                (
+                    customer_session_id,
+                    customer_phone_number,
+                    supplier_phone_number,
+                    supplier_name,
+                    product_name,
+                    quantity,
+                    request_message,
+                    expires_in_minutes,
+                ),
+            )
+            row = cur.fetchone()
+        conn.commit()
+    return {"outreach_id": row[0], "expires_at": row[1].isoformat() if row and row[1] else None}
+
+
+@mcp.tool()
+def find_pending_supplier_outreach_by_supplier_phone(supplier_phone_number: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    outreach_id,
+                    customer_session_id,
+                    customer_phone_number,
+                    supplier_phone_number,
+                    supplier_name,
+                    product_name,
+                    quantity,
+                    request_message,
+                    status,
+                    created_at,
+                    expires_at
+                FROM public.pending_supplier_outreach
+                WHERE supplier_phone_number = %s
+                  AND status = 'pending'
+                  AND expires_at >= CURRENT_TIMESTAMP
+                ORDER BY created_at DESC
+                LIMIT 1
+                """,
+                (supplier_phone_number,),
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    if not row:
+        return {}
+
+    return {
+        "outreach_id": row[0],
+        "customer_session_id": row[1],
+        "customer_phone_number": row[2],
+        "supplier_phone_number": row[3],
+        "supplier_name": row[4],
+        "product_name": row[5],
+        "quantity": row[6],
+        "request_message": row[7],
+        "status": row[8],
+        "created_at": row[9].isoformat() if row[9] else None,
+        "expires_at": row[10].isoformat() if row[10] else None,
+    }
+
+
+@mcp.tool()
+def complete_pending_supplier_outreach(outreach_id: int, supplier_reply: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE public.pending_supplier_outreach
+                SET status = 'replied',
+                    supplier_reply = %s,
+                    replied_at = CURRENT_TIMESTAMP
+                WHERE outreach_id = %s
+                RETURNING customer_session_id, customer_phone_number, supplier_name, product_name
+                """,
+                (supplier_reply, outreach_id),
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    if not row:
+        return {}
+
+    return {
+        "customer_session_id": row[0],
+        "customer_phone_number": row[1],
+        "supplier_name": row[2],
+        "product_name": row[3],
+    }
 
 
 @mcp.tool()
