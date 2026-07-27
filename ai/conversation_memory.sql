@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS public.pending_supplier_outreach (
     request_message TEXT NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP NOT NULL,
     supplier_reply TEXT,
     replied_at TIMESTAMP
 );

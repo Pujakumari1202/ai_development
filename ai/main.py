@@ -1,6 +1,4 @@
 import os
-import threading
-import time
 
 import requests
 from flask import Flask, jsonify, request
@@ -10,10 +8,8 @@ from mcp_client import append_message_via_mcp
 from mcp_client import complete_pending_supplier_outreach_via_mcp
 from mcp_client import create_pending_supplier_outreach_via_mcp
 from mcp_client import ensure_memory_tables_via_mcp
-from mcp_client import find_expired_pending_supplier_outreach_via_mcp
 from mcp_client import find_pending_supplier_outreach_by_supplier_phone_via_mcp
 from mcp_client import load_session_memory_via_mcp
-from mcp_client import mark_pending_supplier_outreach_timed_out_via_mcp
 from mcp_client import save_active_order_context_via_mcp
 
 
@@ -24,10 +20,6 @@ VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN")
 ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
 GRAPH_API_VERSION = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0")
-SUPPLIER_TIMEOUT_CHECK_INTERVAL_SECONDS = int(os.getenv("SUPPLIER_TIMEOUT_CHECK_INTERVAL_SECONDS", "60"))
-
-_timeout_worker_started = False
-_timeout_worker_lock = threading.Lock()
 
 
 def build_session_id(customer_identifier):
@@ -151,7 +143,6 @@ def register_pending_supplier_outreach(customer_identifier: str, session_id: str
         product_name=supplier_contact_result.get("product_name") or (result.get("entities") or {}).get("product_name") or "product",
         quantity=supplier_contact_result.get("quantity") or (result.get("entities") or {}).get("quantity"),
         request_message=supplier_message_status.get("message") or build_supplier_outreach_message(result),
-        expires_in_minutes=30,
     )
 
 
@@ -174,55 +165,6 @@ def handle_supplier_reply(sender: str, text: str) -> bool:
         append_message_via_mcp(pending.get("customer_session_id"), "assistant", customer_message)
 
     return True
-
-
-def process_supplier_timeouts(limit: int = 50) -> dict:
-    expired_outreach = find_expired_pending_supplier_outreach_via_mcp(limit)
-    processed = 0
-
-    for pending in expired_outreach:
-        completion = mark_pending_supplier_outreach_timed_out_via_mcp(pending.get("outreach_id"))
-        if not completion:
-            continue
-
-        customer_phone_number = completion.get("customer_phone_number")
-        customer_session_id = completion.get("customer_session_id")
-        supplier_name = completion.get("supplier_name") or pending.get("supplier_name") or "the supplier"
-        product_name = completion.get("product_name") or pending.get("product_name") or "the product"
-
-        if customer_phone_number:
-            customer_message = (
-                f"I did not receive a reply from {supplier_name} within 30 minutes for {product_name}. "
-                "If you want, I can try another supplier or you can send a new follow-up request."
-            )
-            send_whatsapp_message(customer_phone_number, customer_message)
-            if customer_session_id:
-                append_message_via_mcp(customer_session_id, "assistant", customer_message)
-
-        processed += 1
-
-    return {"processed": processed}
-
-
-def _supplier_timeout_worker() -> None:
-    while True:
-        try:
-            process_supplier_timeouts()
-        except Exception:
-            app.logger.exception("Supplier timeout worker failed")
-        time.sleep(SUPPLIER_TIMEOUT_CHECK_INTERVAL_SECONDS)
-
-
-def start_supplier_timeout_worker() -> None:
-    global _timeout_worker_started
-
-    with _timeout_worker_lock:
-        if _timeout_worker_started:
-            return
-
-        worker = threading.Thread(target=_supplier_timeout_worker, name="supplier-timeout-worker", daemon=True)
-        worker.start()
-        _timeout_worker_started = True
 
 
 def process_message(customer_identifier, user_input):
@@ -250,11 +192,7 @@ def process_message(customer_identifier, user_input):
     final_response = result.get("final_response", "")
 
     if supplier_message_status.get("status") == "sent":
-        supplier_name = (result.get("supplier_contact_result") or {}).get("supplier_name") or "the supplier"
-        final_response = (
-            f"I have sent a WhatsApp message to {supplier_name}. If the supplier replies immediately, I will forward the reply to you right away. "
-            "If there is no reply yet, I will keep this pending for up to 30 minutes."
-        )
+        final_response = "I have sent that message to supplier. Once he reply I will response."
     elif supplier_message_status.get("status") == "failed":
         final_response = (
             "I found the supplier and tried to send the WhatsApp message, but the send failed. "
@@ -347,12 +285,6 @@ def healthz():
     return jsonify({"status": "ok"}), 200
 
 
-@app.post("/supplier-timeouts")
-def supplier_timeouts():
-    result = process_supplier_timeouts()
-    return jsonify(result), 200
-
-
 @app.get("/webhook")
 def verify_webhook():
     mode = request.args.get("hub.mode")
@@ -399,6 +331,4 @@ def receive_webhook():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
-    if os.getenv("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
-        start_supplier_timeout_worker()
     app.run(host="0.0.0.0", port=port, debug=True)

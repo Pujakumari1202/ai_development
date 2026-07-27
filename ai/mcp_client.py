@@ -58,7 +58,6 @@ def create_pending_supplier_outreach_via_mcp(
     product_name: str,
     quantity,
     request_message: str,
-    expires_in_minutes: int = 30,
 ):
     return _call_mcp_tool(
         "create_pending_supplier_outreach",
@@ -70,7 +69,6 @@ def create_pending_supplier_outreach_via_mcp(
             "product_name": product_name,
             "quantity": quantity,
             "request_message": request_message,
-            "expires_in_minutes": expires_in_minutes,
         },
     )
 
@@ -86,20 +84,6 @@ def complete_pending_supplier_outreach_via_mcp(outreach_id: int, supplier_reply:
     return _call_mcp_tool(
         "complete_pending_supplier_outreach",
         {"outreach_id": outreach_id, "supplier_reply": supplier_reply},
-    )
-
-
-def find_expired_pending_supplier_outreach_via_mcp(limit: int = 50):
-    return _call_mcp_tool(
-        "find_expired_pending_supplier_outreach",
-        {"limit": limit},
-    )
-
-
-def mark_pending_supplier_outreach_timed_out_via_mcp(outreach_id: int):
-    return _call_mcp_tool(
-        "mark_pending_supplier_outreach_timed_out",
-        {"outreach_id": outreach_id},
     )
 
 def run_query_via_mcp(query: str):

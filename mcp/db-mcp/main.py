@@ -56,7 +56,6 @@ async def call_tool(request: dict):
                 product_name=params.get("product_name", ""),
                 quantity=params.get("quantity"),
                 request_message=params.get("request_message", ""),
-                expires_in_minutes=params.get("expires_in_minutes", 30),
             )
             return {"result": result}
         if tool_name == "find_pending_supplier_outreach_by_supplier_phone":
@@ -68,16 +67,6 @@ async def call_tool(request: dict):
             result = tools.complete_pending_supplier_outreach(
                 outreach_id=params.get("outreach_id", 0),
                 supplier_reply=params.get("supplier_reply", ""),
-            )
-            return {"result": result}
-        if tool_name == "find_expired_pending_supplier_outreach":
-            result = tools.find_expired_pending_supplier_outreach(
-                limit=params.get("limit", 50),
-            )
-            return {"result": result}
-        if tool_name == "mark_pending_supplier_outreach_timed_out":
-            result = tools.mark_pending_supplier_outreach_timed_out(
-                outreach_id=params.get("outreach_id", 0),
             )
             return {"result": result}
         return {"error": f"Tool '{tool_name}' not found"}
