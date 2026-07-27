@@ -1,4 +1,6 @@
 import os
+import threading
+import time
 
 import requests
 from flask import Flask, jsonify, request
@@ -22,6 +24,10 @@ VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN")
 ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
 GRAPH_API_VERSION = os.getenv("WHATSAPP_GRAPH_API_VERSION", "v20.0")
+SUPPLIER_TIMEOUT_CHECK_INTERVAL_SECONDS = int(os.getenv("SUPPLIER_TIMEOUT_CHECK_INTERVAL_SECONDS", "60"))
+
+_timeout_worker_started = False
+_timeout_worker_lock = threading.Lock()
 
 
 def build_session_id(customer_identifier):
@@ -198,6 +204,27 @@ def process_supplier_timeouts(limit: int = 50) -> dict:
     return {"processed": processed}
 
 
+def _supplier_timeout_worker() -> None:
+    while True:
+        try:
+            process_supplier_timeouts()
+        except Exception:
+            app.logger.exception("Supplier timeout worker failed")
+        time.sleep(SUPPLIER_TIMEOUT_CHECK_INTERVAL_SECONDS)
+
+
+def start_supplier_timeout_worker() -> None:
+    global _timeout_worker_started
+
+    with _timeout_worker_lock:
+        if _timeout_worker_started:
+            return
+
+        worker = threading.Thread(target=_supplier_timeout_worker, name="supplier-timeout-worker", daemon=True)
+        worker.start()
+        _timeout_worker_started = True
+
+
 def process_message(customer_identifier, user_input):
     session_id = build_session_id(customer_identifier)
     session_state = load_session_state(session_id)
@@ -372,4 +399,6 @@ def receive_webhook():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
+    if os.getenv("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+        start_supplier_timeout_worker()
     app.run(host="0.0.0.0", port=port, debug=True)
