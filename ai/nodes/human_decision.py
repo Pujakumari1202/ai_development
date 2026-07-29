@@ -28,6 +28,34 @@ def _build_pending_human_message(state, parsed):
     return ""
 
 
+def _should_auto_contact_supplier(state, parsed):
+    if parsed.get("operation_action") != "human_handoff":
+        return False
+
+    user_input = (state.get("user_input") or "").lower()
+    operation_summary = (parsed.get("operation_summary") or "").lower()
+
+    trigger_phrases = [
+        "check with supplier",
+        "contact supplier",
+        "connect with supplier",
+        "ask supplier",
+        "lower price",
+        "cheap price",
+        "best price",
+        "negotiate",
+        "discount",
+        "confirm availability",
+        "can he give",
+        "can she give",
+        "can he send",
+        "can she send",
+        "discuss with",
+    ]
+
+    return any(phrase in user_input for phrase in trigger_phrases) or "supplier" in operation_summary
+
+
 def _fallback_decision(user_input):
     normalized = user_input.lower()
 
@@ -124,4 +152,5 @@ User request:
         "operation_summary": parsed.get("operation_summary", ""),
         "turnaround_time": parsed.get("turnaround_time", ""),
         "pending_human_message": _build_pending_human_message(state, parsed),
+        "auto_contact_supplier": _should_auto_contact_supplier(state, parsed),
     }

@@ -80,6 +80,13 @@ def find_pending_supplier_outreach_by_supplier_phone_via_mcp(supplier_phone_numb
     )
 
 
+def find_supplier_by_phone_via_mcp(supplier_phone_number: str):
+    return _call_mcp_tool(
+        "find_supplier_by_phone",
+        {"supplier_phone_number": supplier_phone_number},
+    )
+
+
 def complete_pending_supplier_outreach_via_mcp(outreach_id: int, supplier_reply: str):
     return _call_mcp_tool(
         "complete_pending_supplier_outreach",

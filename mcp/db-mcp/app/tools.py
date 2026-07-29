@@ -57,6 +57,16 @@ def ensure_memory_tables():
                 )
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS public.supplier_directory (
+                    supplier_phone_number VARCHAR(30) PRIMARY KEY,
+                    supplier_name VARCHAR(100) NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
         conn.commit()
     return {"status": "ok"}
 
@@ -156,6 +166,17 @@ def create_pending_supplier_outreach(
         with conn.cursor() as cur:
             cur.execute(
                 """
+                INSERT INTO public.supplier_directory (supplier_phone_number, supplier_name)
+                VALUES (%s, %s)
+                ON CONFLICT (supplier_phone_number)
+                DO UPDATE SET
+                    supplier_name = EXCLUDED.supplier_name,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (supplier_phone_number, supplier_name),
+            )
+            cur.execute(
+                """
                 INSERT INTO public.pending_supplier_outreach (
                     customer_session_id,
                     customer_phone_number,
@@ -181,6 +202,31 @@ def create_pending_supplier_outreach(
             row = cur.fetchone()
         conn.commit()
     return {"outreach_id": row[0] if row else None}
+
+
+@mcp.tool()
+def find_supplier_by_phone(supplier_phone_number: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT supplier_phone_number, supplier_name
+                FROM public.supplier_directory
+                WHERE supplier_phone_number = %s
+                LIMIT 1
+                """,
+                (supplier_phone_number,),
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    if not row:
+        return {}
+
+    return {
+        "supplier_phone_number": row[0],
+        "supplier_name": row[1],
+    }
 
 
 @mcp.tool()

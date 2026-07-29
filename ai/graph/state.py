@@ -17,6 +17,7 @@ class AgentState(TypedDict):
     turnaround_time: str
     pending_human_message: str
     human_response: str
+    auto_contact_supplier: bool
     supplier_contact_result: dict
     db_result: list
     final_response: str

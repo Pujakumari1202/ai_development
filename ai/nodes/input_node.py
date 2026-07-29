@@ -17,6 +17,8 @@ def input_node(state):
         "turnaround_time": state.get("turnaround_time", ""),
         "pending_human_message": state.get("pending_human_message", ""),
         "human_response": state.get("human_response", ""),
+        "auto_contact_supplier": state.get("auto_contact_supplier", False),
+        "supplier_contact_result": state.get("supplier_contact_result", {}),
         "db_result": state.get("db_result", []),
         "final_response": state.get("final_response", "")
     }

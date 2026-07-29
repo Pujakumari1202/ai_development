@@ -8,6 +8,7 @@ from mcp_client import append_message_via_mcp
 from mcp_client import complete_pending_supplier_outreach_via_mcp
 from mcp_client import create_pending_supplier_outreach_via_mcp
 from mcp_client import ensure_memory_tables_via_mcp
+from mcp_client import find_supplier_by_phone_via_mcp
 from mcp_client import find_pending_supplier_outreach_by_supplier_phone_via_mcp
 from mcp_client import load_session_memory_via_mcp
 from mcp_client import save_active_order_context_via_mcp
@@ -66,36 +67,12 @@ def build_supplier_outreach_message(result: dict) -> str:
 
 
 def should_contact_supplier(result: dict) -> bool:
-    user_input = (result.get("user_input") or "").lower()
-    operation_mode = result.get("operation_mode")
-    operation_action = result.get("operation_action")
     supplier_contact_result = result.get("supplier_contact_result") or {}
 
     if not supplier_contact_result:
         return False
 
-    if operation_mode != "operations":
-        return False
-
-    if operation_action != "human_handoff":
-        return False
-
-    return any(
-        phrase in user_input
-        for phrase in [
-            "check with supplier",
-            "contact supplier",
-            "connect with supplier",
-            "ask supplier",
-            "lower price",
-            "cheap price",
-            "best price",
-            "negotiate",
-            "confirm availability",
-            "can he give",
-            "can he send",
-        ]
-    )
+    return bool(result.get("auto_contact_supplier"))
 
 
 def contact_supplier_via_whatsapp(result: dict) -> dict:
@@ -146,10 +123,10 @@ def register_pending_supplier_outreach(customer_identifier: str, session_id: str
     )
 
 
-def handle_supplier_reply(sender: str, text: str) -> bool:
+def relay_supplier_reply(sender: str, text: str) -> dict:
     pending = find_pending_supplier_outreach_by_supplier_phone_via_mcp(normalize_whatsapp_recipient(sender))
     if not pending:
-        return False
+        return {}
 
     completion = complete_pending_supplier_outreach_via_mcp(
         outreach_id=pending.get("outreach_id"),
@@ -158,11 +135,34 @@ def handle_supplier_reply(sender: str, text: str) -> bool:
     customer_phone_number = completion.get("customer_phone_number")
     supplier_name = completion.get("supplier_name") or pending.get("supplier_name") or "Supplier"
     product_name = completion.get("product_name") or pending.get("product_name") or "the product"
+    customer_message = f"{supplier_name} replied for {product_name}: {text}"
 
-    if customer_phone_number:
-        customer_message = f"{supplier_name} replied for {product_name}: {text}"
-        send_whatsapp_message(customer_phone_number, customer_message)
-        append_message_via_mcp(pending.get("customer_session_id"), "assistant", customer_message)
+    append_message_via_mcp(pending.get("customer_session_id"), "assistant", customer_message)
+
+    return {
+        "pending": pending,
+        "completion": completion,
+        "customer_phone_number": customer_phone_number,
+        "customer_message": customer_message,
+    }
+
+
+def is_known_supplier(sender: str) -> bool:
+    supplier_phone_number = normalize_whatsapp_recipient(sender)
+    if not supplier_phone_number:
+        return False
+
+    supplier = find_supplier_by_phone_via_mcp(supplier_phone_number)
+    return bool(supplier)
+
+
+def handle_supplier_reply(sender: str, text: str) -> bool:
+    relay_result = relay_supplier_reply(sender, text)
+    if not relay_result:
+        return False
+
+    if relay_result.get("customer_phone_number"):
+        send_whatsapp_message(relay_result["customer_phone_number"], relay_result["customer_message"])
 
     return True
 
@@ -318,6 +318,12 @@ def receive_webhook():
                     continue
 
                 try:
+                    if is_known_supplier(sender):
+                        if handle_supplier_reply(sender, text):
+                            continue
+                        app.logger.info("Ignoring supplier message without pending outreach from %s", sender)
+                        continue
+
                     if handle_supplier_reply(sender, text):
                         continue
                     result = process_whatsapp_message(sender, text)
