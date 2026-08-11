@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Kafy CRM",
+    "slug": "crm-kafy",
+    "version": "1.0.0",
+    "orientation": "default",
+    "scheme": "crmkafy",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0969DA"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
