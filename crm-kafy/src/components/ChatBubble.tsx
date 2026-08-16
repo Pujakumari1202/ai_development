@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import type { ConversationMessage } from "@/types/crm";
+import type { ConversationMessage, MessageSender } from "@/types/crm";
 import { formatDateTime } from "@/utils/date";
 import { colors, radii, spacing } from "@/utils/crm-theme";
 
@@ -8,30 +8,65 @@ type ChatBubbleProps = {
   message: ConversationMessage;
 };
 
+const bubbleTheme: Record<
+  MessageSender,
+  {
+    align: "flex-start" | "flex-end" | "center";
+    background: string;
+    border: string;
+    text: string;
+    meta: string;
+  }
+> = {
+  CUSTOMER: {
+    align: "flex-start",
+    background: "#FFFFFF",
+    border: colors.borderStrong,
+    text: colors.text,
+    meta: colors.mutedText,
+  },
+  SUPPLIER: {
+    align: "flex-start",
+    background: colors.warningSoft,
+    border: "#E6C35C",
+    text: colors.text,
+    meta: "#8A6D00",
+  },
+  AGENT: {
+    align: "flex-end",
+    background: colors.accentSoft,
+    border: colors.accent,
+    text: colors.text,
+    meta: colors.accentHover,
+  },
+  SYSTEM: {
+    align: "center",
+    background: colors.surfaceMuted,
+    border: colors.border,
+    text: colors.mutedText,
+    meta: colors.mutedText,
+  },
+};
+
 export function ChatBubble({ message }: ChatBubbleProps) {
-  const isAgent = message.sender === "AGENT";
-  const isSystem = message.sender === "SYSTEM";
+  const theme = bubbleTheme[message.sender] ?? bubbleTheme.CUSTOMER;
 
   return (
-    <View
-      style={[
-        styles.row,
-        isAgent && styles.rowAgent,
-        isSystem && styles.rowSystem,
-      ]}
-    >
+    <View style={[styles.row, { alignItems: theme.align }]}>
       <View
         style={[
           styles.bubble,
-          isAgent && styles.bubbleAgent,
-          isSystem && styles.bubbleSystem,
+          {
+            backgroundColor: theme.background,
+            borderColor: theme.border,
+          },
         ]}
       >
-        <Text style={styles.sender}>{message.sender}</Text>
-        <Text style={[styles.text, isAgent && styles.textAgent]}>
-          {message.text}
+        <Text style={[styles.sender, { color: theme.meta }]}>
+          {message.sender}
         </Text>
-        <Text style={[styles.time, isAgent && styles.timeAgent]}>
+        <Text style={[styles.text, { color: theme.text }]}>{message.text}</Text>
+        <Text style={[styles.time, { color: theme.meta }]}>
           {formatDateTime(message.timestamp)}
         </Text>
       </View>
@@ -41,49 +76,27 @@ export function ChatBubble({ message }: ChatBubbleProps) {
 
 const styles = StyleSheet.create({
   row: {
-    alignItems: "flex-start",
     marginBottom: spacing.sm,
-  },
-  rowAgent: {
-    alignItems: "flex-end",
-  },
-  rowSystem: {
-    alignItems: "center",
   },
   bubble: {
     maxWidth: "88%",
-    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: 4,
   },
-  bubbleAgent: {
-    backgroundColor: colors.accent,
-  },
-  bubbleSystem: {
-    backgroundColor: colors.closedSoft,
-  },
   sender: {
     fontSize: 10,
     fontWeight: "700",
-    color: colors.mutedText,
     textTransform: "uppercase",
     letterSpacing: 0.4,
   },
   text: {
     fontSize: 13,
-    color: colors.text,
     lineHeight: 18,
-  },
-  textAgent: {
-    color: "#FFFFFF",
   },
   time: {
     fontSize: 10,
-    color: colors.mutedText,
-  },
-  timeAgent: {
-    color: "rgba(255,255,255,0.8)",
   },
 });

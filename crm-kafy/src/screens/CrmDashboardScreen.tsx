@@ -717,6 +717,14 @@ export function CrmDashboardScreen() {
             onChange={(key, value) =>
               setFilters((prev) => ({ ...prev, [key]: value }))
             }
+            canClear={
+              Boolean(search.trim()) ||
+              Object.values(filters).some((value) => value && value !== "All")
+            }
+            onClear={() => {
+              setFilters({});
+              setSearch("");
+            }}
           />
         ) : null}
 
