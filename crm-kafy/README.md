@@ -22,3 +22,12 @@ Copy `.env.example` to `.env` and set:
 Without credentials, replies still save locally (soft-fail). HTTP errors show an alert but still persist the message.
 
 Test customer **Farhan** (`+916290363971`) has an OPEN ticket for outbound WhatsApp checks.
+
+## Docker (static web)
+
+```bash
+docker build -t kafy-crm .
+docker run --rm -p 8080:80 kafy-crm
+```
+
+Optional WhatsApp build-args: `EXPO_PUBLIC_WHATSAPP_ACCESS_TOKEN`, `EXPO_PUBLIC_WHATSAPP_PHONE_NUMBER_ID`, `EXPO_PUBLIC_WHATSAPP_GRAPH_API_VERSION` (baked in at `expo export` time).
