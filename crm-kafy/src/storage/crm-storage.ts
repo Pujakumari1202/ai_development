@@ -1,20 +1,16 @@
-/**
- * CRM persistence layer.
- *
- * Today: AsyncStorage (local demo).
- * Later: replace load/save/reset bodies with HTTP calls to your API.
- * Keep the same function signatures so hooks/screens stay unchanged.
- */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { createSeedData } from "@/data/mock-data";
+import { apiRequest } from "@/services/api";
 import type { CRMData } from "@/types/crm";
 
-/** Bump when seed shape changes so demos re-seed cleanly. */
 const STORAGE_KEY = "crm-kafy.demo-data.v3";
+const USE_LOCAL_DATA = process.env.EXPO_PUBLIC_USE_LOCAL_DATA === "true";
 
 export async function loadCrmData(): Promise<CRMData> {
-  // API swap: GET /api/crm
+  if (!USE_LOCAL_DATA) {
+    return apiRequest<CRMData>("/api/crm");
+  }
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     if (!raw) {
@@ -32,13 +28,24 @@ export async function loadCrmData(): Promise<CRMData> {
 }
 
 export async function saveCrmData(data: CRMData): Promise<void> {
-  // API swap: PUT /api/crm
+  if (!USE_LOCAL_DATA) {
+    await apiRequest<CRMData>("/api/crm", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    return;
+  }
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
 export async function resetCrmData(): Promise<CRMData> {
-  // API swap: POST /api/crm/reset (dev only)
   const seed = createSeedData();
+  if (!USE_LOCAL_DATA) {
+    return apiRequest<CRMData>("/api/crm/reset", {
+      method: "POST",
+      body: JSON.stringify(seed),
+    });
+  }
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
   return seed;
 }

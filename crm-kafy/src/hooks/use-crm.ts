@@ -64,8 +64,9 @@ export function useCrm() {
   const [error, setError] = useState<string | null>(null);
 
   const persist = useCallback(async (next: CRMData) => {
-    setData(next);
     await saveCrmData(next);
+    setData(next);
+    setError(null);
   }, []);
 
   useEffect(() => {
@@ -168,7 +169,6 @@ export function useCrm() {
           : item,
       );
 
-      // Persist locally first so the demo never loses the reply.
       await persist({ ...data, tickets: nextTickets });
 
       const customer = data.customers.find((c) => c.name === ticket.customer);

@@ -2,12 +2,6 @@
 #
 # Build:
 #   docker build -t kafy-crm .
-# With WhatsApp env baked in (EXPO_PUBLIC_* are compile-time only):
-#   docker build -t kafy-crm \
-#     --build-arg EXPO_PUBLIC_WHATSAPP_ACCESS_TOKEN=... \
-#     --build-arg EXPO_PUBLIC_WHATSAPP_PHONE_NUMBER_ID=... \
-#     --build-arg EXPO_PUBLIC_WHATSAPP_GRAPH_API_VERSION=v21.0 \
-#     .
 # Run:
 #   docker run --rm -p 8080:80 kafy-crm
 
@@ -15,13 +9,8 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
-# Optional WhatsApp Cloud API credentials (inlined into the JS bundle at export)
-ARG EXPO_PUBLIC_WHATSAPP_ACCESS_TOKEN=
-ARG EXPO_PUBLIC_WHATSAPP_PHONE_NUMBER_ID=
-ARG EXPO_PUBLIC_WHATSAPP_GRAPH_API_VERSION=v21.0
-ENV EXPO_PUBLIC_WHATSAPP_ACCESS_TOKEN=$EXPO_PUBLIC_WHATSAPP_ACCESS_TOKEN \
-    EXPO_PUBLIC_WHATSAPP_PHONE_NUMBER_ID=$EXPO_PUBLIC_WHATSAPP_PHONE_NUMBER_ID \
-    EXPO_PUBLIC_WHATSAPP_GRAPH_API_VERSION=$EXPO_PUBLIC_WHATSAPP_GRAPH_API_VERSION
+ARG EXPO_PUBLIC_API_URL=http://localhost:3001
+ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
 
 COPY package.json package-lock.json ./
 RUN npm ci

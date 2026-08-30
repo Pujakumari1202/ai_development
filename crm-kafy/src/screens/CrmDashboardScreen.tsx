@@ -179,11 +179,11 @@ export function CrmDashboardScreen() {
   }, [data, filters, search, sort]);
 
   const customerRows = useMemo(() => {
-    if (!data) return [] as Array<Customer & {
+    if (!data) return [] as (Customer & {
       openTickets: number;
       closedTickets: number;
       lastActivity: string;
-    }>;
+    })[];
     const q = search.trim().toLowerCase();
     let rows = data.customers.map((customer) => {
       const related = data.tickets.filter((t) => t.customer === customer.name);
@@ -215,11 +215,11 @@ export function CrmDashboardScreen() {
   }, [data, search, sort]);
 
   const supplierRows = useMemo(() => {
-    if (!data) return [] as Array<Supplier & {
+    if (!data) return [] as (Supplier & {
       openRequests: number;
       completed: number;
       lastResponse: string;
-    }>;
+    })[];
     const q = search.trim().toLowerCase();
     let rows = data.suppliers.map((supplier) => {
       const related = data.tickets.filter((t) => t.supplier === supplier.name);
@@ -251,11 +251,11 @@ export function CrmDashboardScreen() {
   }, [data, search, sort]);
 
   const managerRows = useMemo(() => {
-    if (!data) return [] as Array<Manager & {
+    if (!data) return [] as (Manager & {
       assignedAccounts: number;
       openTickets: number;
       closedTickets: number;
-    }>;
+    })[];
     const q = search.trim().toLowerCase();
     let rows = data.managers.map((manager) => {
       const accounts = data.customers.filter((c) => c.manager === manager.name);

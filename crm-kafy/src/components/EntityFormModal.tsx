@@ -96,6 +96,8 @@ export function EntityFormModal({
   const [values, setValues] = useState<FormValues>(initial);
 
   useEffect(() => {
+    // The modal stays mounted; opening a different entity must reset draft fields.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (visible) setValues(initial);
   }, [initial, visible]);
 
